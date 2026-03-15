@@ -1,0 +1,43 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "n:\\uralgamejam\\uraljam26\\intermediate\\build\\win64\\unrealeditor\\inc\\uraljam26\\uht\\uw_mainmenu.gen.cpp",
+        "ProvidedModule": "",
+        "PCH": "n:\\uralgamejam\\uraljam26\\intermediate\\build\\win64\\x64\\uraljam26editor\\development\\unrealed\\sharedpch.unrealed.project.valapi.cpp20.h.pch",
+        "Includes": [
+            "n:\\uralgamejam\\uraljam26\\intermediate\\build\\win64\\x64\\unrealeditor\\development\\uraljam26\\definitions.uraljam26.h",
+            "n:\\uralgamejam\\uraljam26\\source\\uraljam26\\public\\uw_mainmenu.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\umg\\public\\blueprint\\userwidget.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\umg\\public\\blueprint\\widgetchild.h",
+            "n:\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\umg\\uht\\widgetchild.generated.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\coreuobject\\public\\uobject\\objectsavecontext.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\coreuobject\\public\\uobject\\cookenums.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\coreuobject\\public\\uobject\\objectsaveoverride.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\umg\\public\\components\\slatewrappertypes.h",
+            "n:\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\umg\\uht\\slatewrappertypes.generated.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\umg\\public\\components\\widget.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\fieldnotification\\public\\fieldnotificationdeclaration.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\fieldnotification\\public\\ifieldnotificationclassdescriptor.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\fieldnotification\\public\\inotifyfieldvaluechanged.h",
+            "n:\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\fieldnotification\\uht\\inotifyfieldvaluechanged.generated.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\umg\\public\\components\\visual.h",
+            "n:\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\umg\\uht\\visual.generated.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\umg\\public\\slate\\widgettransform.h",
+            "n:\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\umg\\uht\\widgettransform.generated.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\umg\\public\\blueprint\\widgetnavigation.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\slatecore\\public\\types\\navigationmetadata.h",
+            "n:\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\umg\\uht\\widgetnavigation.generated.h",
+            "n:\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\umg\\uht\\widget.generated.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\umg\\public\\components\\namedslotinterface.h",
+            "n:\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\umg\\uht\\namedslotinterface.generated.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\slate\\public\\widgets\\layout\\anchors.h",
+            "n:\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\slate\\uht\\anchors.generated.h",
+            "n:\\ue_5.4\\engine\\source\\runtime\\umg\\public\\animation\\widgetanimationevents.h",
+            "n:\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\umg\\uht\\widgetanimationevents.generated.h",
+            "n:\\ue_5.4\\engine\\intermediate\\build\\win64\\unrealeditor\\inc\\umg\\uht\\userwidget.generated.h",
+            "n:\\uralgamejam\\uraljam26\\intermediate\\build\\win64\\unrealeditor\\inc\\uraljam26\\uht\\uw_mainmenu.generated.h"
+        ],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}
