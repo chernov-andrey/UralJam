@@ -73,3 +73,46 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+#---------------------------------------------------------------------
+# Unreal Engine build folders
+/Binaries/
+/Intermediate/
+/Saved/
+/DerivedDataCache/
+/Build/
+
+# Packaged game
+/StagedBuilds/
+/Dist/
+
+# Visual Studio
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.opensdf
+*.sdf
+*.ipch
+*.psess
+*.VC.db
+*.VC.VC.opendb
+
+# Binary files
+*.pdb
+*.dll
+*.exe
+*.ucas
+*.utoc
+*.ushaderbytecode
+*.pak
+/UralJam26/Saved/Logs
+/UralJam26/Saved/Config/CrashReportClient/UECC-Windows-696B248B406714FE4A1214A69F6CE745
+/UralJam26/Intermediate
+/UralJam26/Intermediate
+/UralJam26/Intermediate
+/UralJam26/Saved
+/UralJam26/Binaries
+/UralJam26/Saved
+/UralJam26/Intermediate
+/UralJam26/Binaries
