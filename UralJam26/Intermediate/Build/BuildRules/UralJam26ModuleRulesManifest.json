@@ -1,8 +1,8 @@
 {
 	"SourceFiles": [
-		"N:\\UralGameJam\\UralJam26\\Source\\UralJam26\\UralJam26.Build.cs",
-		"N:\\UralGameJam\\UralJam26\\Source\\UralJam26.Target.cs",
-		"N:\\UralGameJam\\UralJam26\\Source\\UralJam26Editor.Target.cs"
+		"G:\\Create\\Jame\\UralJam\\UralJam26\\Source\\UralJam26\\UralJam26.Build.cs",
+		"G:\\Create\\Jame\\UralJam\\UralJam26\\Source\\UralJam26.Target.cs",
+		"G:\\Create\\Jame\\UralJam\\UralJam26\\Source\\UralJam26Editor.Target.cs"
 	],
 	"EngineVersion": "5.4.4"
 }

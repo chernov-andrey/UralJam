@@ -167,14 +167,14 @@ UUW_MainMenu::~UUW_MainMenu() {}
 // End Class UUW_MainMenu
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_UralGameJam_UralJam26_Source_UralJam26_Public_UW_MainMenu_h_Statics
+struct Z_CompiledInDeferFile_FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UW_MainMenu_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
 		{ Z_Construct_UClass_UUW_MainMenu, UUW_MainMenu::StaticClass, TEXT("UUW_MainMenu"), &Z_Registration_Info_UClass_UUW_MainMenu, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UUW_MainMenu), 351161852U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_UralGameJam_UralJam26_Source_UralJam26_Public_UW_MainMenu_h_2309284521(TEXT("/Script/UralJam26"),
-	Z_CompiledInDeferFile_FID_UralGameJam_UralJam26_Source_UralJam26_Public_UW_MainMenu_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_UralGameJam_UralJam26_Source_UralJam26_Public_UW_MainMenu_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UW_MainMenu_h_2309284521(TEXT("/Script/UralJam26"),
+	Z_CompiledInDeferFile_FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UW_MainMenu_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UW_MainMenu_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration

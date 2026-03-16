@@ -1,11 +1,11 @@
-"N:\UralGameJam\UralJam26\Intermediate\Build\Win64\UnrealEditor\Inc\UralJam26\UHT\Menu_PlayerController.gen.cpp"
-/FI"N:\UralGameJam\UralJam26\Intermediate\Build\Win64\x64\UralJam26Editor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h"
-/FI"N:\UralGameJam\UralJam26\Intermediate\Build\Win64\x64\UnrealEditor\Development\UralJam26\Definitions.UralJam26.h"
-/Yu"N:\UralGameJam\UralJam26\Intermediate\Build\Win64\x64\UralJam26Editor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h"
-/Fp"N:\UralGameJam\UralJam26\Intermediate\Build\Win64\x64\UralJam26Editor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h.pch"
-/Fo"N:\UralGameJam\UralJam26\Intermediate\Build\Win64\x64\UnrealEditor\Development\UralJam26\Menu_PlayerController.gen.cpp.obj"
-/sourceDependencies "N:\UralGameJam\UralJam26\Intermediate\Build\Win64\x64\UnrealEditor\Development\UralJam26\Menu_PlayerController.gen.cpp.dep.json"
-@"N:\UralGameJam\UralJam26\Intermediate\Build\Win64\x64\UnrealEditor\Development\UralJam26\UralJam26.Shared.rsp"
+"G:\Create\Jame\UralJam\UralJam26\Intermediate\Build\Win64\UnrealEditor\Inc\UralJam26\UHT\Menu_PlayerController.gen.cpp"
+/FI"G:\Create\Jame\UralJam\UralJam26\Intermediate\Build\Win64\x64\UralJam26Editor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h"
+/FI"G:\Create\Jame\UralJam\UralJam26\Intermediate\Build\Win64\x64\UnrealEditor\Development\UralJam26\Definitions.UralJam26.h"
+/Yu"G:\Create\Jame\UralJam\UralJam26\Intermediate\Build\Win64\x64\UralJam26Editor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h"
+/Fp"G:\Create\Jame\UralJam\UralJam26\Intermediate\Build\Win64\x64\UralJam26Editor\Development\UnrealEd\SharedPCH.UnrealEd.Project.ValApi.Cpp20.h.pch"
+/Fo"G:\Create\Jame\UralJam\UralJam26\Intermediate\Build\Win64\x64\UnrealEditor\Development\UralJam26\Menu_PlayerController.gen.cpp.obj"
+/sourceDependencies "G:\Create\Jame\UralJam\UralJam26\Intermediate\Build\Win64\x64\UnrealEditor\Development\UralJam26\Menu_PlayerController.gen.cpp.dep.json"
+@"G:\Create\Jame\UralJam\UralJam26\Intermediate\Build\Win64\x64\UnrealEditor\Development\UralJam26\UralJam26.Shared.rsp"
 /Zc:inline
 /nologo
 /Oi

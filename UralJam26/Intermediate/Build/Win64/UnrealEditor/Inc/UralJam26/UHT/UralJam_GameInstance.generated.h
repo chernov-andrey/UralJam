@@ -14,11 +14,11 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 #endif
 #define URALJAM26_UralJam_GameInstance_generated_h
 
-#define FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_RPC_WRAPPERS_NO_PURE_DECLS \
+#define FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_RPC_WRAPPERS_NO_PURE_DECLS \
 	DECLARE_FUNCTION(execStartGame);
 
 
-#define FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_INCLASS_NO_PURE_DECLS \
+#define FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesUUralJam_GameInstance(); \
 	friend struct Z_Construct_UClass_UUralJam_GameInstance_Statics; \
@@ -27,7 +27,7 @@ public: \
 	DECLARE_SERIALIZER(UUralJam_GameInstance)
 
 
-#define FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_ENHANCED_CONSTRUCTORS \
+#define FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_ENHANCED_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
 	NO_API UUralJam_GameInstance(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get()); \
 private: \
@@ -41,13 +41,13 @@ public: \
 	NO_API virtual ~UUralJam_GameInstance();
 
 
-#define FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_13_PROLOG
-#define FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_GENERATED_BODY \
+#define FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_13_PROLOG
+#define FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_RPC_WRAPPERS_NO_PURE_DECLS \
-	FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_INCLASS_NO_PURE_DECLS \
-	FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_ENHANCED_CONSTRUCTORS \
+	FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_RPC_WRAPPERS_NO_PURE_DECLS \
+	FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_INCLASS_NO_PURE_DECLS \
+	FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_16_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -55,7 +55,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 template<> URALJAM26_API UClass* StaticClass<class UUralJam_GameInstance>();
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h
+#define CURRENT_FILE_ID FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h
 
 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

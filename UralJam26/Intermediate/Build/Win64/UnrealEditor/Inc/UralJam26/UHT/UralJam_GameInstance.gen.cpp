@@ -130,14 +130,14 @@ UUralJam_GameInstance::~UUralJam_GameInstance() {}
 // End Class UUralJam_GameInstance
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_Statics
+struct Z_CompiledInDeferFile_FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
 		{ Z_Construct_UClass_UUralJam_GameInstance, UUralJam_GameInstance::StaticClass, TEXT("UUralJam_GameInstance"), &Z_Registration_Info_UClass_UUralJam_GameInstance, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UUralJam_GameInstance), 3526864775U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_232103932(TEXT("/Script/UralJam26"),
-	Z_CompiledInDeferFile_FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_UralGameJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_232103932(TEXT("/Script/UralJam26"),
+	Z_CompiledInDeferFile_FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_Create_Jame_UralJam_UralJam26_Source_UralJam26_Public_UralJam_GameInstance_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration
