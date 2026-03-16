@@ -3,15 +3,38 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InputAction.h"
+#include "InputMappingContext.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "GameFramework/PlayerController.h"
 #include "Game_PlayerController.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class URALJAM26_API AGame_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "Input Settings")
+	TObjectPtr<UInputAction> IA_Move;
+	
+	UPROPERTY(EditAnywhere, Category = "Input Settings")
+	TObjectPtr<UInputAction> IA_Look;
+	
+	UPROPERTY(EditAnywhere, Category = "Input Settings")
+	TObjectPtr<UInputAction> IA_Pause;
+
+	UPROPERTY(EditAnywhere, Category = "Input Settings")
+	TObjectPtr<UInputMappingContext> MappingContext;
+private:
 	virtual  void BeginPlay() override;
+	UFUNCTION()
+	void Move(const FInputActionValue& Value);
+	UFUNCTION()
+	void Look(const FInputActionValue& Value);
+	UFUNCTION()
+	void PauseFlipFlop(const FInputActionValue& Value);
+
+	virtual void SetupInputComponent() override;
 };
