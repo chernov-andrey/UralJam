@@ -42,18 +42,18 @@ void UUW_PauseMenu::OnStartNewGameButtonClicked()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT(" UUW_MainMenu: UralJam_GameInstance not found!"));
+		UE_LOG(LogTemp, Error, TEXT(" UUW_MainMenu::OnStartNewGameButtonClicked: UralJam_GameInstance not found!"));
 	}
 }
 void UUW_PauseMenu::OnClouseMenuButtonClicked()
 {
-	if (AGame_PlayerController* PlayerController = Cast<AGame_PlayerController>(GetOwningPlayer()))
+	if (UralJam_GameInstance)
 	{
-		PlayerController->OpenClosePauseMenu();
+		UralJam_GameInstance->OpenClosePauseMenu();
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("UUW_PauseMenu::OnClouseMenuButtonClicked:  PlayerController FAIL CAST to AGame_PlayerController!"));
+		UE_LOG(LogTemp, Error, TEXT(" UUW_MainMenu::OnClouseMenuButtonClicked: UralJam_GameInstance not found!"));
 	}
 }
 void UUW_PauseMenu::OnExitGameButtonClicked()

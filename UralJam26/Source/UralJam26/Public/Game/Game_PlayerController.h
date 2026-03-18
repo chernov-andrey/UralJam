@@ -30,11 +30,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Settings Controller Game_PlayerController | Input Settings")
 	TObjectPtr<UInputMappingContext> MappingContext;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings Controller Game_PlayerController | Settings view widgets", 
-		meta = (ClampMin = "1.0", ClampMax = "15.0",
-			UIMin = "1.0", UIMax = "15.0"))
-	float LifeTime_SplashScreen = 2.0f; //Время существования splash screen widget
-
 
 private:
 	virtual void SetupInputComponent() override;
@@ -44,21 +39,6 @@ private:
 	TObjectPtr<UUralJam_GameInstance>	UralJam_GameInstance;
 
 
-	UPROPERTY()
-	TObjectPtr<UUserWidget> MainMenu_Widget;
-
-	// Splash Screen Widget ------------------------------------------------------------------------------------
-
-	UPROPERTY()
-	TObjectPtr<UUserWidget> SplashScreen_Widget;
-	
-	UFUNCTION()
-	void CreateSplashScreen_Widget();
-	UFUNCTION()
-	void RemoveSplashScreen_Widget();
-	FTimerHandle TimerHandle_LifeTemporaryWidget;
-	
-
 	// Management game mod ------------------------------------------------------------------------------------
 	
 
@@ -66,22 +46,14 @@ private:
 	void SetGameMod_InMenu();
 	UFUNCTION()
 	void SetGameMod_InGame();
-
 	
-
-	// Pause ------------------------------------------------------------------------------------
 public:
 	UFUNCTION()
-	void OpenClosePauseMenu();
-private:
-	UPROPERTY()
-	TObjectPtr<UUserWidget> PauseMenu;
+	void ActivationController();
 
-	UFUNCTION()
-	bool HiddenPauseMenu();
-	UFUNCTION()
-	bool ShowPauseMenu();
-	
+private:
+	void OpenClosePauseMenu();
+
 
 	// Management move ------------------------------------------------------------------------------------
 	

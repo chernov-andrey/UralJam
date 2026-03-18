@@ -11,7 +11,7 @@ class USettings_SaveGame;
 class UProgress_SaveGame;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLevelLoading);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStarted);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStarted);//игра начинается либо новая либо продолжение, открывается карта
 
 	UENUM(BlueprintType)
 		enum class EGameState : uint8
@@ -29,6 +29,52 @@ class URALJAM26_API UUralJam_GameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
+
+	// Splash Screen ------------------------------------------------------------------------------------------
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings Controller Game_PlayerController | Settings view widgets",
+		meta = (ClampMin = "1.0", ClampMax = "15.0",
+			UIMin = "1.0", UIMax = "15.0"))
+	float LifeTime_SplashScreen = 2.0f; //Время существования splash screen widget
+	
+	UFUNCTION()
+	void CreateSplashScreen_Widget();
+	UFUNCTION()
+	void RemoveSplashScreen_Widget();
+private:
+	FTimerHandle TimerHandle_LifeTemporaryWidget;
+	UPROPERTY()
+	TObjectPtr<UUserWidget> SplashScreen_Widget;
+
+	// Pause Menu ------------------------------------------------------------------------------------------
+
+public:
+	UFUNCTION()
+	void OpenClosePauseMenu();
+private:
+	UPROPERTY()
+	TObjectPtr<UUserWidget> PauseMenu;
+
+	UFUNCTION()
+	void HiddenPauseMenu();
+	UFUNCTION()
+	void ShowPauseMenu();
+
+	// Main Menu ------------------------------------------------------------------------------------------
+public:
+	UFUNCTION()
+	void CreateMainMenu_Widget();
+	UFUNCTION()
+	void RemoveMainMenu_Widget();
+private:
+	UPROPERTY()
+	TObjectPtr<UUserWidget> MainMenu_Widget;
+
+
+
+public:
+
+
 	UFUNCTION()
 	bool IsGameState_state(EGameState state)const;
 
@@ -47,19 +93,6 @@ public:
 
 	virtual void Init() override;
 
-	// Get CLASS WIDGET----------------------------------------------------------------------------------------
-	
-	UFUNCTION()
-	TSubclassOf<UUserWidget> GetClass_Widget_PauseMenu()const;
-
-	UFUNCTION()
-	TSubclassOf<UUserWidget> GetClass_Widget_MainMenu()const;
-
-	UFUNCTION()
-	TSubclassOf<UUserWidget> GetClass_Widget_SplashScreen()const;
-
-	UFUNCTION()
-	TSubclassOf<UUserWidget> GetClass_Widget_LoadingScreen()const;
 
 
 
@@ -101,10 +134,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Game | Settings")
 	float GetMasterVolume()const;
-	
-	
+
 	
 protected:
+	//Names ----------------------------------------------------------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Maps")
 	FName Level_1_Name = TEXT("Level_1");
@@ -120,16 +153,16 @@ protected:
 	// Widget classes ----------------------------------------------------------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
-	TSubclassOf<UUserWidget> Widget_MainMenu;
+	TSubclassOf<UUserWidget> WidgetType_MainMenu;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
-	TSubclassOf<UUserWidget> Widget_PauseMenu;
+	TSubclassOf<UUserWidget> WidgetType_PauseMenu;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
-	TSubclassOf<UUserWidget> Widget_SplashScreen;
+	TSubclassOf<UUserWidget> WidgetType_SplashScreen;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
-	TSubclassOf<UUserWidget> Widget_LoadingScreen;
+	TSubclassOf<UUserWidget> WidgetType_LoadingScreen;
 
 
 

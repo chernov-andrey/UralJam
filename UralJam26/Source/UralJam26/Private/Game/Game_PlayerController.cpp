@@ -17,11 +17,11 @@ void AGame_PlayerController::BeginPlay()
     {
         if (UralJam_GameInstance->IsGameState_state(EGameState::GS_Starting)) 
         {
-            MainMenu_Widget = CreateWidget(this, UralJam_GameInstance->GetClass_Widget_MainMenu());
-            MainMenu_Widget->AddToViewport();
-            CreateSplashScreen_Widget();
-            UralJam_GameInstance->OnGameStartedEvent.AddDynamic(this,&ThisClass::);
-        //прив€затьс€ дл€ инициализации игрока
+            UralJam_GameInstance->CreateMainMenu_Widget();
+            UralJam_GameInstance->CreateSplashScreen_Widget();
+
+            UralJam_GameInstance->OnGameStartedEvent.AddDynamic(this,&ThisClass::ActivationController);      
+            
         }
 
     }else
@@ -50,43 +50,11 @@ void AGame_PlayerController::SetGameMod_InGame()
     bShowMouseCursor = true;
 }
 
-
-// Temporary Widget ------------------------------------------------------------------------------------------
-
-
-void AGame_PlayerController::CreateSplashScreen_Widget()
+void AGame_PlayerController::ActivationController()
 {
-    if (UralJam_GameInstance &&  !TimerHandle_LifeTemporaryWidget.IsValid())
-    {
-        DisableInput(this);
-        bShowMouseCursor = false;
-        SetInputMode(FInputModeUIOnly());
+    //¬ыбрать место
 
-        SplashScreen_Widget = CreateWidget(this, UralJam_GameInstance->GetClass_Widget_SplashScreen());
-        SplashScreen_Widget->AddToViewport();
-        GetWorldTimerManager().SetTimer(TimerHandle_LifeTemporaryWidget, this, &AGame_PlayerController::RemoveSplashScreen_Widget, LifeTime_SplashScreen, false);
-        
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::CreateTemporaryWidget: It cannot be completed now!"));
-    }
 }
-void AGame_PlayerController::RemoveSplashScreen_Widget()
-{
-    GetWorldTimerManager().ClearTimer(TimerHandle_LifeTemporaryWidget);
-    if (SplashScreen_Widget)
-    {
-        SplashScreen_Widget->RemoveFromParent();
-    }
- 
-    UralJam_GameInstance->SetGameState_state(EGameState::GS_MainMenu);
-    bShowMouseCursor = true;
-}
-
-
-
-
 
 // Setup Input Component------------------------------------------------------------------------------------------
 
@@ -138,64 +106,15 @@ void AGame_PlayerController::Look(const FInputActionValue& Value)
 
 void AGame_PlayerController::OpenClosePauseMenu()
 {
-    if (IsPaused())
+    UralJam_GameInstance = Cast<UUralJam_GameInstance>(GetGameInstance());
+    if (UralJam_GameInstance)
     {
-        UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : Pause = false"));
-        SetPause(false);
-        if (HiddenPauseMenu())
-        {
-            SetInputMode(FInputModeGameOnly());
-            bShowMouseCursor = false;
-        }
+        UralJam_GameInstance->OpenClosePauseMenu();
     }
     else
     {
-        UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : Pause = true"));
-        SetPause(true);
-        if (ShowPauseMenu())
-        {
-            SetInputMode(FInputModeGameAndUI());
-            bShowMouseCursor = true;
-        }
+        UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::BeginPlay: FAIL CAST GameInstance to UralJam_GameInstance!"));
     }
 }
 
 
-bool AGame_PlayerController::HiddenPauseMenu()
-{
-    if (PauseMenu)
-    {
-        PauseMenu->RemoveFromParent();
-        PauseMenu = nullptr;
-        return true;
-    }
-    else 
-    {
-        UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::HiddenPauseMenu: attempt to close a missing widget"));
-        return false;
-    }
-}
-bool AGame_PlayerController::ShowPauseMenu()
-{
-    if (!PauseMenu)
-    {
-        if (UralJam_GameInstance)
-        {
-                PauseMenu = CreateWidget<UUserWidget>(this, UralJam_GameInstance ->GetClass_Widget_PauseMenu());
-        }
-        else
-        {
-            UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::ShowPauseMenu: UralJam_GameInstance is invalid pointer "));
-        }
-    }
-    if (PauseMenu)
-    {
-        PauseMenu->AddToViewport();
-        return true;
-    }
-    else 
-    {
-        UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::ShowPauseMenu: couldn't create widget PauseMenu"));
-        return false;
-    }
-}

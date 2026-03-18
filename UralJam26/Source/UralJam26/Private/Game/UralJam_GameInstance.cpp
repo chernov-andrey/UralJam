@@ -11,8 +11,8 @@
 
 void UUralJam_GameInstance::Init()
 {
-	GameState = EGameState::GS_Starting;
 	Super::Init();
+	GameState = EGameState::GS_Starting;
 	LoadSettings();
 	LoadProgress();
 	StartLoadAsyncLevel(Level_1_Name, 1);
@@ -192,31 +192,6 @@ float UUralJam_GameInstance::GetMasterVolume()const
 
 }
 
-// GETTING class widget  -------------------------------------------------------------------------------------------
-
-TSubclassOf<UUserWidget> UUralJam_GameInstance::GetClass_Widget_PauseMenu() const
-{
-	check(Widget_PauseMenu);
-	return Widget_PauseMenu;
-}
-TSubclassOf<UUserWidget> UUralJam_GameInstance::GetClass_Widget_MainMenu()const
-{
-	check(Widget_MainMenu);
-	return Widget_MainMenu;
-}
-
-TSubclassOf<UUserWidget> UUralJam_GameInstance::GetClass_Widget_SplashScreen() const
-{
-	check(Widget_SplashScreen);
-	return Widget_SplashScreen;
-}
-
-TSubclassOf<UUserWidget> UUralJam_GameInstance::GetClass_Widget_LoadingScreen() const
-{
-	check(Widget_LoadingScreen);
-	return Widget_LoadingScreen;
-}
-
 
 // checking the readiness of levels -------------------------------------------------------------------------------------------
  
@@ -259,3 +234,113 @@ void UUralJam_GameInstance::SetGameState_state(EGameState State)
 {
 	GameState = State;
 }
+
+
+// Splash Screen ------------------------------------------------------------------------------------------
+
+
+void UUralJam_GameInstance::CreateSplashScreen_Widget()
+{
+	if ( !TimerHandle_LifeTemporaryWidget.IsValid())
+	{
+		check(WidgetType_SplashScreen);
+		/*
+		DisableInput(this);
+		bShowMouseCursor = false;
+		SetInputMode(FInputModeUIOnly());
+		*/
+		SplashScreen_Widget = CreateWidget(this, WidgetType_SplashScreen);
+		SplashScreen_Widget->AddToViewport();
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_LifeTemporaryWidget, this, &UUralJam_GameInstance::RemoveSplashScreen_Widget, LifeTime_SplashScreen, false);
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::CreateTemporaryWidget: It cannot be completed now!"));
+	}
+}
+void UUralJam_GameInstance::RemoveSplashScreen_Widget()
+{
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_LifeTemporaryWidget);
+	if (SplashScreen_Widget)
+	{
+		SplashScreen_Widget->RemoveFromParent();
+	}
+
+	SetGameState_state(EGameState::GS_MainMenu);
+	
+	//bShowMouseCursor = true;
+}
+
+
+// Pause menu ------------------------------------------------------------------------------------------
+
+
+void UUralJam_GameInstance::OpenClosePauseMenu()
+{/*
+	if (IsPaused())
+	{
+		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : Pause = false"));
+		SetPause(false);
+		if (HiddenPauseMenu())
+		{
+			SetInputMode(FInputModeGameOnly());
+			bShowMouseCursor = false;
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : Pause = true"));
+		SetPause(true);
+		if (ShowPauseMenu())
+		{
+			SetInputMode(FInputModeGameAndUI());
+			bShowMouseCursor = true;
+		}
+	}*/
+}
+void UUralJam_GameInstance::HiddenPauseMenu()
+{
+	if (PauseMenu)
+	{
+		PauseMenu->RemoveFromParent();
+		PauseMenu = nullptr;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::HiddenPauseMenu: attempt to close a missing widget"));
+	}
+}
+void UUralJam_GameInstance::ShowPauseMenu()
+{
+	check(WidgetType_PauseMenu);
+	if (!PauseMenu)
+	{
+		PauseMenu = CreateWidget<UUserWidget>(this, WidgetType_PauseMenu);
+	}
+	if (PauseMenu)
+	{
+		PauseMenu->AddToViewport();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::ShowPauseMenu: couldn't create widget PauseMenu"));
+	}
+}
+
+
+// Main menu ------------------------------------------------------------------------------------------
+
+void UUralJam_GameInstance::CreateMainMenu_Widget()
+{
+	check(WidgetType_MainMenu);
+
+	MainMenu_Widget = CreateWidget(this, WidgetType_MainMenu);
+	MainMenu_Widget->AddToViewport();
+
+}
+
+void UUralJam_GameInstance::RemoveMainMenu_Widget()
+{
+}
+
