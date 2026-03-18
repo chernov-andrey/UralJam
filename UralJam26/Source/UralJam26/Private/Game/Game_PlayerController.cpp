@@ -2,13 +2,62 @@
 
 
 #include "Game\Game_PlayerController.h"
+#include "InputAction.h"
+#include "InputMappingContext.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet\GameplayStatics.h"
+#include "Game\UralJam_GameInstance.h"
 
 void AGame_PlayerController::BeginPlay()
 {
-	SetInputMode(FInputModeGameOnly());
-	bShowMouseCursor = false;
+    UralJam_GameInstance = Cast<UUralJam_GameInstance>(GetGameInstance());
+    if (UralJam_GameInstance)
+    {
+        if (UralJam_GameInstance->IsGameState_state(EGameState::GS_Starting)) 
+        {
+            UralJam_GameInstance->CreateMainMenu_Widget();
+            UralJam_GameInstance->CreateSplashScreen_Widget();
+
+            UralJam_GameInstance->OnGameStartedEvent.AddDynamic(this,&ThisClass::ActivationController);      
+            
+        }
+
+    }else
+    {
+        UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::BeginPlay: FAIL CAST GameInstance to UralJam_GameInstance!"));
+    }
+    
+    Super::BeginPlay();
+}
+
+
+// Management game mod  ------------------------------------------------------------------------------------------
+
+
+void AGame_PlayerController::SetGameMod_InMenu()
+{
+    DisableInput(this);
+    SetInputMode(FInputModeGameAndUI());
+    bShowMouseCursor = true;
+}
+
+void AGame_PlayerController::SetGameMod_InGame()
+{
+    EnableInput(this);
+    SetInputMode(FInputModeGameOnly());
+    bShowMouseCursor = true;
+}
+
+void AGame_PlayerController::ActivationController()
+{
+    //Выбрать место
 
 }
+
+// Setup Input Component------------------------------------------------------------------------------------------
+
 
 void AGame_PlayerController::SetupInputComponent()
 {
@@ -23,7 +72,7 @@ void AGame_PlayerController::SetupInputComponent()
         UE_LOG(LogTemp, Display, TEXT("AGame_PlayerController::SetupInputComponent  is Success!"))
         EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AGame_PlayerController::Move);
         EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AGame_PlayerController::Look);
-        EnhancedInputComponent->BindAction(IA_Pause, ETriggerEvent::Triggered, this, &AGame_PlayerController::OpenCloseMenu);
+        EnhancedInputComponent->BindAction(IA_Pause, ETriggerEvent::Triggered, this, &AGame_PlayerController::OpenClosePauseMenu);
     }
     else
     {
@@ -32,74 +81,10 @@ void AGame_PlayerController::SetupInputComponent()
 
 }
 
-void AGame_PlayerController::OpenCloseMenu()
-{
-    if (IsPaused())
-    {
-        UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : Pause = false"));
-        SetPause(false);
-        if (HiddenMainMenu())
-        {
-            SetInputMode(FInputModeGameOnly());
-            bShowMouseCursor = false;
-        }
-    }
-    else
-    {
-        UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : Pause = true"));
-        SetPause(true);
-        if (ShowMainMenu())
-        {
-            SetInputMode(FInputModeGameAndUI());
-            bShowMouseCursor = true;
-        }
-    }
-}
-bool AGame_PlayerController::HiddenMainMenu()
-{
-    if (MainMenu)
-    {
-        MainMenu->RemoveFromParent();
-        MainMenu = nullptr;
-        return true;
-    }
-    else 
-    {
-        UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::HiddenMainMenu: attempt to close a missing widget"));
-        return false;
-    }
-}
-bool AGame_PlayerController::ShowMainMenu()
-{
-    if (!MainMenu)
-    {
-        if (UUralJam_GameInstance* GameInstance = Cast<UUralJam_GameInstance>(GetGameInstance()))
-        {
-            if (TSubclassOf<UUserWidget> ClassWidget = GameInstance->GetClass_Widget_PauseMenu())
-            {
-                MainMenu = CreateWidget<UUserWidget>(this, ClassWidget);
-            }
-            else
-            {
-                UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::ShowMainMenu: UUralJam_GameInstance - Widget_MainMenu Not a definition"));
-            }
-        }
-        else
-        {
-            UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::ShowMainMenu: another class was expected GameInstance"));
-        }
-    }
-    if (MainMenu)
-    {
-        MainMenu->AddToViewport();
-        return true;
-    }
-    else 
-    {
-        UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::ShowMainMenu: couldn't create widget MainMenu"));
-        return false;
-    }
-}
+
+// Movement Player ------------------------------------------------------------------------------------------
+
+
 void AGame_PlayerController::Move(const FInputActionValue& Value)
 {
     FVector2D MoveDirect = Value.Get<FVector2D>();
@@ -112,10 +97,24 @@ void AGame_PlayerController::Move(const FInputActionValue& Value)
     
 
 }
-
 void AGame_PlayerController::Look(const FInputActionValue& Value)
 {
     FVector2D LookDirect = Value.Get<FVector2D>();
 
 
 }
+
+void AGame_PlayerController::OpenClosePauseMenu()
+{
+    UralJam_GameInstance = Cast<UUralJam_GameInstance>(GetGameInstance());
+    if (UralJam_GameInstance)
+    {
+        UralJam_GameInstance->OpenClosePauseMenu();
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::BeginPlay: FAIL CAST GameInstance to UralJam_GameInstance!"));
+    }
+}
+
+

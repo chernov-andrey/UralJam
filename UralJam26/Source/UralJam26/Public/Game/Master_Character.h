@@ -5,9 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Structures/CharacterStats.h"
-#include "Intrfaces/Damageable_Interface.h"
 #include "Master_Character.generated.h"
-
 
 UCLASS(Abstract)
 class URALJAM26_API AMaster_Character : public ACharacter
