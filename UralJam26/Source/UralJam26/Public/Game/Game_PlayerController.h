@@ -28,7 +28,12 @@ public:
 	TObjectPtr<UInputAction> IA_Pause;
 
 	UPROPERTY(EditAnywhere, Category = "Settings Controller Game_PlayerController | Input Settings")
-	TObjectPtr<UInputMappingContext> MappingContext;
+	TObjectPtr<UInputMappingContext> MappingContext_Game;
+	
+	UPROPERTY(EditAnywhere, Category = "Settings Controller Game_PlayerController | Input Settings")
+	TObjectPtr<UInputMappingContext> MappingContext_Menu;
+
+
 
 
 private:

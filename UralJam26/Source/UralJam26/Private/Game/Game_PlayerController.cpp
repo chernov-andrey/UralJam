@@ -17,18 +17,25 @@ void AGame_PlayerController::BeginPlay()
     {
         if (UralJam_GameInstance->IsGameState_state(EGameState::GS_Starting)) 
         {
+            UralJam_GameInstance->SetPlayerController(this);
+
             UralJam_GameInstance->CreateMainMenu_Widget();
             UralJam_GameInstance->CreateSplashScreen_Widget();
+         
+            DisableInput(this);
+            SetInputMode(FInputModeUIOnly());
+            bShowMouseCursor = true;
 
             UralJam_GameInstance->OnGameStartedEvent.AddDynamic(this,&ThisClass::ActivationController);      
-            
         }
 
-    }else
+    }
+    else
     {
         UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::BeginPlay: FAIL CAST GameInstance to UralJam_GameInstance!"));
     }
     
+
     Super::BeginPlay();
 }
 
@@ -65,7 +72,8 @@ void AGame_PlayerController::SetupInputComponent()
     if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
         ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
     {
-        Subsystem->AddMappingContext(MappingContext, 0);
+        Subsystem->AddMappingContext(MappingContext_Game, 1);
+        Subsystem->AddMappingContext(MappingContext_Menu, 0);
     }
     if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
     {

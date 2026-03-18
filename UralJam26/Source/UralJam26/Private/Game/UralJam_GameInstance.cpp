@@ -18,7 +18,10 @@ void UUralJam_GameInstance::Init()
 	StartLoadAsyncLevel(Level_1_Name, 1);
 }
 
-
+void UUralJam_GameInstance::SetPlayerController(TObjectPtr<AGame_PlayerController> lPlayerController)
+{
+	PlayerController = lPlayerController;
+}
 
 //Load level  -------------------------------------------------------------------------------------------
 
@@ -59,7 +62,6 @@ void  UUralJam_GameInstance::LoadedLevel(int32 i)
 		if (LevelStreaming->IsLevelLoaded())
 		{
 			UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is loaded"), *LoadedLevelName.ToString());
-			//LevelStreaming->SetShouldBeVisible(true);
 			OnLevelLoadedEvent.Broadcast();
 		}
 }
@@ -99,7 +101,6 @@ void UUralJam_GameInstance::LoadProgress()
 		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::LoadProgress: fail load Progress!(not found save) "));
 	}
 }
-
 void UUralJam_GameInstance::SaveProgress() 
 {
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::SaveProgress(): TRY SAVEGAME!"));
@@ -107,18 +108,21 @@ void UUralJam_GameInstance::SaveProgress()
 }
 
 
-void  UUralJam_GameInstance::StartNewGame()
+void  UUralJam_GameInstance::StartNewGame() // нажата кнопка в меню и она вызывает 
 {
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::StartNewGame"));
-	//открываем виджет загрузки
-	//стираем сохранние
-	//загружаем уровень
-
-	//открываем уровень 
-
+	SetGameState_state(EGameState::GS_Loading);
+	CreateLoadingScreen_Widget();
+	RemoveMainMenu_Widget();
+	//PlayerController;////////////// говорим сонтроллеру подготовься
+	
+		ULevelStreaming* LevelStreaming = UGameplayStatics::GetStreamingLevel(this, Level_1_Name);
+	if (LevelStreaming->IsLevelLoaded())
+	{
+		UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is loaded"), *Level_1_Name.ToString());
+		LevelStreaming->SetShouldBeVisible(true);		
+	}
 }
-
-
 void UUralJam_GameInstance::StartContinueGame()
 {
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::StartContinueGame"));
@@ -195,6 +199,7 @@ float UUralJam_GameInstance::GetMasterVolume()const
 
 // checking the readiness of levels -------------------------------------------------------------------------------------------
  
+
 bool UUralJam_GameInstance::CanContinueGame() const
 {
 	if (Progress)
@@ -224,7 +229,11 @@ bool UUralJam_GameInstance::CanNewGame() const
 	}
 	return false;
 }
+
+
 // checking Game state -------------------------------------------------------------------------------------------
+
+
 bool UUralJam_GameInstance::IsGameState_state(EGameState State) const
 {
 	return( GameState == State);
@@ -236,32 +245,62 @@ void UUralJam_GameInstance::SetGameState_state(EGameState State)
 }
 
 
+// Loading Screen ------------------------------------------------------------------------------------------
+
+
+void UUralJam_GameInstance::CreateLoadingScreen_Widget()
+{
+	if (!TimerHandle_LifeLoadingWidget.IsValid())
+	{
+		check(WidgetType_LoadingScreen);
+		LoadingScreen_Widget = CreateWidget(this, WidgetType_LoadingScreen);
+		LoadingScreen_Widget->AddToViewport();
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_LifeLoadingWidget, this, &UUralJam_GameInstance::RemoveLoadingScreen_Widget, MinLifeTime_LoadingScreen, false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::CreateLoadingScreen_Widget: It cannot be completed now!"));
+	}
+}
+void UUralJam_GameInstance::RemoveLoadingScreen_Widget()
+{
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_LifeLoadingWidget);
+	if (LoadingScreen_Widget)
+	{
+		LoadingScreen_Widget->RemoveFromParent();
+	}
+
+	SetGameState_state(EGameState::GS_InGame);
+
+	OnGameStartedEvent.Broadcast();
+}
+
+
+
 // Splash Screen ------------------------------------------------------------------------------------------
+
+
 
 
 void UUralJam_GameInstance::CreateSplashScreen_Widget()
 {
-	if ( !TimerHandle_LifeTemporaryWidget.IsValid())
+	if ( !TimerHandle_LifeSplashWidget.IsValid())
 	{
 		check(WidgetType_SplashScreen);
-		/*
-		DisableInput(this);
-		bShowMouseCursor = false;
-		SetInputMode(FInputModeUIOnly());
-		*/
+
 		SplashScreen_Widget = CreateWidget(this, WidgetType_SplashScreen);
 		SplashScreen_Widget->AddToViewport();
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_LifeTemporaryWidget, this, &UUralJam_GameInstance::RemoveSplashScreen_Widget, LifeTime_SplashScreen, false);
-		
+
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_LifeSplashWidget, this, &UUralJam_GameInstance::RemoveSplashScreen_Widget, LifeTime_SplashScreen, false);	
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::CreateTemporaryWidget: It cannot be completed now!"));
+		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::CreateLoadingScreen_Widget: It cannot be completed now!"));
 	}
 }
 void UUralJam_GameInstance::RemoveSplashScreen_Widget()
 {
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_LifeTemporaryWidget);
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_LifeSplashWidget);
 	if (SplashScreen_Widget)
 	{
 		SplashScreen_Widget->RemoveFromParent();
@@ -269,7 +308,6 @@ void UUralJam_GameInstance::RemoveSplashScreen_Widget()
 
 	SetGameState_state(EGameState::GS_MainMenu);
 	
-	//bShowMouseCursor = true;
 }
 
 
@@ -308,7 +346,7 @@ void UUralJam_GameInstance::HiddenPauseMenu()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::HiddenPauseMenu: attempt to close a missing widget"));
+		UE_LOG(LogTemp, Display, TEXT(" UUralJam_GameInstance::HiddenPauseMenu: attempt to close a missing widget"));
 	}
 }
 void UUralJam_GameInstance::ShowPauseMenu()
@@ -324,7 +362,7 @@ void UUralJam_GameInstance::ShowPauseMenu()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::ShowPauseMenu: couldn't create widget PauseMenu"));
+		UE_LOG(LogTemp, Display, TEXT(" UUralJam_GameInstance::ShowPauseMenu: couldn't create widget PauseMenu"));
 	}
 }
 
@@ -337,10 +375,13 @@ void UUralJam_GameInstance::CreateMainMenu_Widget()
 
 	MainMenu_Widget = CreateWidget(this, WidgetType_MainMenu);
 	MainMenu_Widget->AddToViewport();
-
 }
 
 void UUralJam_GameInstance::RemoveMainMenu_Widget()
 {
+	if (MainMenu_Widget)
+	{
+		MainMenu_Widget->RemoveFromParent();
+	}
 }
 

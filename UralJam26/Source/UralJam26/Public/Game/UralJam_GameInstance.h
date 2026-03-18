@@ -9,6 +9,7 @@
 class UUserWidget;
 class USettings_SaveGame;
 class UProgress_SaveGame;
+class AGame_PlayerController;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLevelLoading);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStarted);//игра начинается либо новая либо продолжение, открывается карта
@@ -18,7 +19,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStarted);//игра начинается либо новая ли
 	{
 		GS_Starting,
 		GS_MainMenu,
-		GS_LoadingLevel,
+		GS_Loading,
 		GS_InGame,
 		GS_Paused
 	};
@@ -29,24 +30,50 @@ class URALJAM26_API UUralJam_GameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
+	
+	void SetPlayerController(TObjectPtr<AGame_PlayerController> lPlayerController);
+private:
+	UPROPERTY()
+	TObjectPtr<AGame_PlayerController> PlayerController;
 
 	// Splash Screen ------------------------------------------------------------------------------------------
 
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings Controller Game_PlayerController | Settings view widgets",
 		meta = (ClampMin = "1.0", ClampMax = "15.0",
 			UIMin = "1.0", UIMax = "15.0"))
-	float LifeTime_SplashScreen = 2.0f; //Время существования splash screen widget
+	float LifeTime_SplashScreen = 2.0f; 
 	
 	UFUNCTION()
 	void CreateSplashScreen_Widget();
 	UFUNCTION()
 	void RemoveSplashScreen_Widget();
 private:
-	FTimerHandle TimerHandle_LifeTemporaryWidget;
+	FTimerHandle TimerHandle_LifeSplashWidget;
 	UPROPERTY()
 	TObjectPtr<UUserWidget> SplashScreen_Widget;
 
+
+	// Loading Screen ------------------------------------------------------------------------------------------
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings Controller Game_PlayerController | Settings view widgets",
+		meta = (ClampMin = "1.0", ClampMax = "15.0",
+			UIMin = "1.0", UIMax = "15.0"))
+	float MinLifeTime_LoadingScreen = 2.0f; 
+
+	UFUNCTION()
+	void CreateLoadingScreen_Widget();
+	UFUNCTION()
+	void RemoveLoadingScreen_Widget();
+private:
+	FTimerHandle TimerHandle_LifeLoadingWidget;
+	UPROPERTY()
+	TObjectPtr<UUserWidget> LoadingScreen_Widget;
+
+
 	// Pause Menu ------------------------------------------------------------------------------------------
+
 
 public:
 	UFUNCTION()
@@ -61,6 +88,7 @@ private:
 	void ShowPauseMenu();
 
 	// Main Menu ------------------------------------------------------------------------------------------
+
 public:
 	UFUNCTION()
 	void CreateMainMenu_Widget();
@@ -108,7 +136,7 @@ public:
 	FGameStarted OnGameStartedEvent;
 
 	// Settings ----------------------------------------------------------------------------------------
-	
+public:
 	UFUNCTION(BlueprintCallable, Category = "Game | Save/Load")
 	void SaveSettings();
 
@@ -119,7 +147,7 @@ public:
 	void ApplySettings();
 	
 	// Progress ----------------------------------------------------------------------------------------
-	
+public:
 	UFUNCTION()
 	void LoadProgress();
 
@@ -128,7 +156,7 @@ public:
 
 
 	// Audio ----------------------------------------------------------------------------------------
-	
+	public:
 	UFUNCTION(BlueprintCallable, Category = "Game | Settings")
 	void SetMasterVolume(float newVolume);
 
