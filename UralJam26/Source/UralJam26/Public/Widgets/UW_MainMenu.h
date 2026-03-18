@@ -4,18 +4,26 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Game\UralJam_GameInstance.h"
-#include "Components\Button.h"
-#include "Components\Slider.h"
 #include "UW_MainMenu.generated.h"
 
-class UGame_for_UralJam_GameInstance;
 class AMenu_PlayerController;
+class UButton;
+class USlider;
+class UUralJam_GameInstance;
 
 UCLASS(Abstract)
 class URALJAM26_API UUW_MainMenu : public UUserWidget
 {
 	GENERATED_BODY()
+public:
+	UFUNCTION()
+	void UpdateState_ContinueGameButton();
+	
+	UFUNCTION()
+	void DecouplingAll_forDelegate();
+	
+	UFUNCTION()
+	void UpdateState_StartNewGameButton();
 protected:
 	virtual void NativeConstruct() override;
 	

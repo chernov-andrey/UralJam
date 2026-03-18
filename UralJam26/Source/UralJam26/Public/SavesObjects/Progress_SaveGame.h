@@ -15,4 +15,5 @@ class URALJAM26_API UProgress_SaveGame : public USaveGame
 	GENERATED_BODY()
 public:
 	bool bIsNewGame = true;
+	FName LevelForContinue_Name;
 };

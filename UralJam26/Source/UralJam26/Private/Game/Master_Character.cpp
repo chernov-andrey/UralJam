@@ -2,6 +2,7 @@
 
 
 #include "Game\Master_Character.h"
+#include "Intrfaces/Damageable_Interface.h"
 
 // Sets default values
 AMaster_Character::AMaster_Character()

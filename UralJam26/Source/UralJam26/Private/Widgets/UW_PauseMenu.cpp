@@ -2,6 +2,10 @@
 
 
 #include "Widgets\UW_PauseMenu.h"
+#include "Game\UralJam_GameInstance.h"
+#include "Components\Button.h"
+#include "Components\Slider.h"
+#include "Game\Game_PlayerController.h"
 
 void UUW_PauseMenu::NativeConstruct()
 {
@@ -34,7 +38,7 @@ void UUW_PauseMenu::OnStartNewGameButtonClicked()
 {
 	if (UralJam_GameInstance)
 	{
-		UralJam_GameInstance->StartGame();
+		UralJam_GameInstance->StartNewGame();
 	}
 	else
 	{
@@ -45,7 +49,7 @@ void UUW_PauseMenu::OnClouseMenuButtonClicked()
 {
 	if (AGame_PlayerController* PlayerController = Cast<AGame_PlayerController>(GetOwningPlayer()))
 	{
-		PlayerController->OpenCloseMenu();
+		PlayerController->OpenClosePauseMenu();
 	}
 	else
 	{

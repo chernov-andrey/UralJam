@@ -4,15 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Game\UralJam_GameInstance.h"
-#include "Components\Button.h"
-#include "Components\Slider.h"
-#include "Game\Game_PlayerController.h"
 #include "UW_PauseMenu.generated.h"
 
-class UGame_for_UralJam_GameInstance;
 class AMenu_PlayerController;
 class AGame_PlayerController;
+class UButton;
+class USlider;
+class UUralJam_GameInstance;
+
 UCLASS()
 class URALJAM26_API UUW_PauseMenu : public UUserWidget
 {
