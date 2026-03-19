@@ -38,7 +38,7 @@ void UUW_PauseMenu::OnStartNewGameButtonClicked()
 {
 	if (UralJam_GameInstance)
 	{
-		UralJam_GameInstance->StartNewGame();
+		UralJam_GameInstance->StartNewSession();
 	}
 	else
 	{

@@ -22,8 +22,6 @@ void AGame_PlayerController::BeginPlay()
             UralJam_GameInstance->CreateMainMenu_Widget();
             UralJam_GameInstance->CreateSplashScreen_Widget();
          
-            DisableInput(this);
-            SetInputMode(FInputModeUIOnly());
             bShowMouseCursor = true;
 
             UralJam_GameInstance->OnGameStartedEvent.AddDynamic(this,&ThisClass::ActivationController);      
@@ -35,7 +33,7 @@ void AGame_PlayerController::BeginPlay()
         UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::BeginPlay: FAIL CAST GameInstance to UralJam_GameInstance!"));
     }
     
-
+   
     Super::BeginPlay();
 }
 
@@ -43,37 +41,40 @@ void AGame_PlayerController::BeginPlay()
 // Management game mod  ------------------------------------------------------------------------------------------
 
 
-void AGame_PlayerController::SetGameMod_InMenu()
-{
-    DisableInput(this);
-    SetInputMode(FInputModeGameAndUI());
-    bShowMouseCursor = true;
-}
 
-void AGame_PlayerController::SetGameMod_InGame()
-{
-    EnableInput(this);
-    SetInputMode(FInputModeGameOnly());
-    bShowMouseCursor = true;
-}
 
 void AGame_PlayerController::ActivationController()
 {
     //Выбрать место
-
+    if (SubsystemInput)
+    {
+       
+    }
 }
 
 // Setup Input Component------------------------------------------------------------------------------------------
 
 
+void AGame_PlayerController::SkipAll()
+{
+    UE_LOG(LogTemp, Error, TEXT("SkipAll SkipAll SkipAll SkipAll SkipAll SkipAll"));
+    OnSkipCutsceneEvent.Broadcast(true);
+}
+
+void AGame_PlayerController::SkipOne()
+{
+    UE_LOG(LogTemp, Error, TEXT("SkipOne SkipOne SkipOne SkipOne SkipOne SkipOne"));
+    OnSkipCutsceneEvent.Broadcast(false);
+}
+
 void AGame_PlayerController::SetupInputComponent()
 {
     Super::SetupInputComponent();
-    if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
-        ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+    SubsystemInput = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+    if (SubsystemInput)
     {
-        Subsystem->AddMappingContext(MappingContext_Game, 1);
-        Subsystem->AddMappingContext(MappingContext_Menu, 0);
+        SubsystemInput->AddMappingContext(MappingContext_Game, 0);
+        SubsystemInput->AddMappingContext(MappingContext_Menu, 1);    
     }
     if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
     {
@@ -81,6 +82,9 @@ void AGame_PlayerController::SetupInputComponent()
         EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AGame_PlayerController::Move);
         EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AGame_PlayerController::Look);
         EnhancedInputComponent->BindAction(IA_Pause, ETriggerEvent::Triggered, this, &AGame_PlayerController::OpenClosePauseMenu);
+       
+        EnhancedInputComponent->BindAction(IA_Skip_All, ETriggerEvent::Triggered, this, &AGame_PlayerController::SkipAll);
+        EnhancedInputComponent->BindAction(IA_Skip_One, ETriggerEvent::Triggered, this, &AGame_PlayerController::SkipOne);
     }
     else
     {
@@ -95,6 +99,7 @@ void AGame_PlayerController::SetupInputComponent()
 
 void AGame_PlayerController::Move(const FInputActionValue& Value)
 {
+    UE_LOG(LogTemp, Error, TEXT("MOVE  MOVE  MOVE  MOVE  MOVE"));
     FVector2D MoveDirect = Value.Get<FVector2D>();
     APawn* PossessedPawn = Cast<APawn>(GetPawn());
     if (PossessedPawn)

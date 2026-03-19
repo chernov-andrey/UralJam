@@ -16,8 +16,8 @@ class URALJAM26_API UUW_MainMenu : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION()
-	void UpdateState_ContinueGameButton();
+	/*UFUNCTION()
+	void UpdateState_ContinueGameButton();*/
 	
 	UFUNCTION()
 	void DecouplingAll_forDelegate();
@@ -35,11 +35,11 @@ private:
 	void OnStartNewGameButtonClicked();
 	
 	// ContinueGameButton --------------------------------------------------------------------------
-	UPROPERTY(meta = (BindWidget))
+	/*UPROPERTY(meta = (BindWidget))
 	UButton* ContinueGameButton;
 	UFUNCTION()
 	void OnContinueGameButtonClicked();
-
+	*/
 
 	//ExitGameButton --------------------------------------------------------------------------
 	UPROPERTY(meta = (BindWidget))

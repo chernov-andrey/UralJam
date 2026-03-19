@@ -10,6 +10,7 @@ class UUserWidget;
 class USettings_SaveGame;
 class UProgress_SaveGame;
 class AGame_PlayerController;
+class UUW_Cutscene;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLevelLoading);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStarted);//игра начинается либо новая либо продолжение, открывается карта
@@ -21,7 +22,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStarted);//игра начинается либо новая ли
 		GS_MainMenu,
 		GS_Loading,
 		GS_InGame,
-		GS_Paused
+		GS_Paused,
+		GS_Cutscene
 	};
 
 
@@ -35,6 +37,8 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<AGame_PlayerController> PlayerController;
+
+
 
 	// Splash Screen ------------------------------------------------------------------------------------------
 
@@ -112,20 +116,32 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Game | State")
 	EGameState GameState;
 
-	UFUNCTION()
-	void StartContinueGame();
+	/*UFUNCTION()// процесс запуска ПРОДОЛЖЕНИЯ игровой сессии из сохранения
+	void StartContinueSession(); */
 	
-	UFUNCTION()
-	void StartNewGame();
+	UFUNCTION()//процесс запуска НОВОЙ игровой сессии 
+	void StartNewSession();
 	
+	UFUNCTION()// Создаем виджет катсцены 
+	void LaunchCutscene(TSubclassOf<UUW_Cutscene> ClassCutsceneWidget);
+	UFUNCTION()
+	void EndLaunchCutscene(UUW_Cutscene* CutscenePtr);
+private:
+	UPROPERTY()
+	TObjectPtr<UUW_Cutscene> Cutscene_Widget;
+
+public:
+
+	UFUNCTION() // Запуск Физики активация контроллера
+	void StartPlay();
 
 	virtual void Init() override;
 
 
 
 
-	UFUNCTION()
-	bool CanContinueGame()const;
+	/*UFUNCTION()
+	bool CanContinueGame()const;*/
 	UFUNCTION()
 	bool CanNewGame()const;
 
@@ -148,12 +164,12 @@ public:
 	
 	// Progress ----------------------------------------------------------------------------------------
 public:
-	UFUNCTION()
+	/*UFUNCTION()
 	void LoadProgress();
 
 	UFUNCTION(BlueprintCallable)
 	void SaveProgress();
-
+	*/
 
 	// Audio ----------------------------------------------------------------------------------------
 	public:
@@ -192,7 +208,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
 	TSubclassOf<UUserWidget> WidgetType_LoadingScreen;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
+	TSubclassOf<UUW_Cutscene> WidgetType_1_Cutscene;
 
 
 

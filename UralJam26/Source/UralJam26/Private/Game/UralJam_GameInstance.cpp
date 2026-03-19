@@ -3,6 +3,9 @@
 
 #include "Game\UralJam_GameInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "Widgets/UW_Cutscene.h"
+
+#include "Game\Game_PlayerController.h"
 #include "SavesObjects\Progress_SaveGame.h"
 #include "SavesObjects\Settings_SaveGame.h"
 #include "Engine/LevelStreaming.h"
@@ -14,7 +17,7 @@ void UUralJam_GameInstance::Init()
 	Super::Init();
 	GameState = EGameState::GS_Starting;
 	LoadSettings();
-	LoadProgress();
+	/*LoadProgress();*/
 	StartLoadAsyncLevel(Level_1_Name, 1);
 }
 
@@ -68,7 +71,7 @@ void  UUralJam_GameInstance::LoadedLevel(int32 i)
 
 //PROGRESS  -------------------------------------------------------------------------------------------
 // Загружаем сохраненный прогресс и если есть запись о пршлой игре подгружаем уровень
-
+/*
 void UUralJam_GameInstance::LoadProgress()
 {
 	
@@ -106,28 +109,52 @@ void UUralJam_GameInstance::SaveProgress()
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::SaveProgress(): TRY SAVEGAME!"));
 	UGameplayStatics::SaveGameToSlot(Progress, SaveSlotProgress, 0);
 }
+*/
 
-
-void  UUralJam_GameInstance::StartNewGame() // нажата кнопка в меню и она вызывает 
+void  UUralJam_GameInstance::LaunchCutscene(TSubclassOf<UUW_Cutscene> ClassCutsceneWidget)
 {
-	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::StartNewGame"));
+	SetGameState_state(EGameState::GS_Cutscene);
+	Cutscene_Widget = Cast<UUW_Cutscene>(CreateWidget(this, ClassCutsceneWidget));
+	Cutscene_Widget->AddToViewport();
+	PlayerController->OnSkipCutsceneEvent.AddDynamic(Cutscene_Widget, &UUW_Cutscene::SkipCutscene);
+	
+	Cutscene_Widget->OnEndCutsceneEvent.AddDynamic(this, &UUralJam_GameInstance::EndLaunchCutscene);
+}
+void  UUralJam_GameInstance::EndLaunchCutscene(UUW_Cutscene* CutscenePtr)
+{
+	PlayerController->OnSkipCutsceneEvent.RemoveDynamic(CutscenePtr, &UUW_Cutscene::SkipCutscene);
+	CutscenePtr->RemoveFromParent();
+	SetGameState_state(EGameState::GS_InGame);
+}
+
+void  UUralJam_GameInstance::StartPlay() // Начало новой игры
+{
+	PlayerController->ActivationController();
+}
+
+void  UUralJam_GameInstance::StartNewSession() // Начало новой cсессии
+{
+	
+	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::StartNewSession"));
 	SetGameState_state(EGameState::GS_Loading);
+	LaunchCutscene(WidgetType_1_Cutscene);
 	CreateLoadingScreen_Widget();
 	RemoveMainMenu_Widget();
-	//PlayerController;////////////// говорим сонтроллеру подготовься
 	
-		ULevelStreaming* LevelStreaming = UGameplayStatics::GetStreamingLevel(this, Level_1_Name);
+	ULevelStreaming* LevelStreaming = UGameplayStatics::GetStreamingLevel(this, Level_1_Name);
 	if (LevelStreaming->IsLevelLoaded())
 	{
 		UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is loaded"), *Level_1_Name.ToString());
 		LevelStreaming->SetShouldBeVisible(true);		
 	}
 }
-void UUralJam_GameInstance::StartContinueGame()
+
+/*
+void UUralJam_GameInstance::StartContinueSession()
 {
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::StartContinueGame"));
 
-}
+}*/
 
 
 
@@ -199,7 +226,7 @@ float UUralJam_GameInstance::GetMasterVolume()const
 
 // checking the readiness of levels -------------------------------------------------------------------------------------------
  
-
+/*
 bool UUralJam_GameInstance::CanContinueGame() const
 {
 	if (Progress)
@@ -218,7 +245,7 @@ bool UUralJam_GameInstance::CanContinueGame() const
 
 	UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::CanContinueGame: Can't continue game! "));
 	return false;
-}
+}*/
 bool UUralJam_GameInstance::CanNewGame() const
 {
 	ULevelStreaming* LevelStreaming = UGameplayStatics::GetStreamingLevel(this, Level_1_Name);

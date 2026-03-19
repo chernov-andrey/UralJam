@@ -9,14 +9,19 @@ class UUralJam_GameInstance;
 class UInputAction;
 class UInputMappingContext;
 class UUserWidget;
+class UEnhancedInputLocalPlayerSubsystem;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkipCutscene, bool, skipAll);
 UCLASS()
 class URALJAM26_API AGame_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 public:
+	FOnSkipCutscene OnSkipCutsceneEvent;
 
-	
+private:
+	UPROPERTY()
+	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> SubsystemInput;
 public:
 	UPROPERTY(EditAnywhere, Category = "Settings Controller Game_PlayerController | Input Settings")
 	TObjectPtr<UInputAction> IA_Move;
@@ -27,13 +32,21 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Settings Controller Game_PlayerController | Input Settings")
 	TObjectPtr<UInputAction> IA_Pause;
 
+
+	UPROPERTY(EditAnywhere, Category = "Settings Controller Game_PlayerController | Input Settings")
+	TObjectPtr<UInputAction> IA_Skip_All;
+
+	UPROPERTY(EditAnywhere, Category = "Settings Controller Game_PlayerController | Input Settings")
+	TObjectPtr<UInputAction> IA_Skip_One;
+
 	UPROPERTY(EditAnywhere, Category = "Settings Controller Game_PlayerController | Input Settings")
 	TObjectPtr<UInputMappingContext> MappingContext_Game;
 	
 	UPROPERTY(EditAnywhere, Category = "Settings Controller Game_PlayerController | Input Settings")
 	TObjectPtr<UInputMappingContext> MappingContext_Menu;
 
-
+	void SkipAll();
+	void SkipOne();
 
 
 private:
@@ -47,10 +60,6 @@ private:
 	// Management game mod ------------------------------------------------------------------------------------
 	
 
-	UFUNCTION()
-	void SetGameMod_InMenu();
-	UFUNCTION()
-	void SetGameMod_InGame();
 	
 public:
 	UFUNCTION()

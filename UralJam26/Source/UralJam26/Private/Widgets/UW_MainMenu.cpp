@@ -14,10 +14,10 @@ void UUW_MainMenu::NativeConstruct()
 	{
 		StartNewGameButton->OnClicked.AddDynamic(this, &UUW_MainMenu::OnStartNewGameButtonClicked);
 	}
-	if (ContinueGameButton)
+	/*if (ContinueGameButton)
 	{
 		ContinueGameButton->OnClicked.AddDynamic(this, &UUW_MainMenu::OnContinueGameButtonClicked);
-	}
+	}*/
 	if (ExitGameButton)
 	{
 		ExitGameButton->OnClicked.AddDynamic(this, &UUW_MainMenu::OnExitGameButtonClicked);
@@ -39,14 +39,14 @@ void UUW_MainMenu::NativeConstruct()
 				UralJam_GameInstance->OnLevelLoadedEvent.AddDynamic(this, &UUW_MainMenu::UpdateState_StartNewGameButton);
 			}
 		}
-		if (!UralJam_GameInstance->CanContinueGame())
+		/*if (!UralJam_GameInstance->CanContinueGame())
 		{
 			if (ContinueGameButton)
 			{
 				ContinueGameButton->SetIsEnabled(false);
 				UralJam_GameInstance->OnLevelLoadedEvent.AddDynamic(this,&UUW_MainMenu::UpdateState_ContinueGameButton);
 			}
-		}
+		}*/
 	}
 	else 
 	{
@@ -72,6 +72,7 @@ void UUW_MainMenu::UpdateState_StartNewGameButton()
 		UE_LOG(LogTemp, Error, TEXT("UUW_MainMenu::UpdateState_StartNewGameButton: UralJam_GameInstance is invalid!"));
 	}
 }
+/*
 void UUW_MainMenu::UpdateState_ContinueGameButton()
 {
 	if (UralJam_GameInstance)
@@ -86,7 +87,7 @@ void UUW_MainMenu::UpdateState_ContinueGameButton()
 	{
 		UE_LOG(LogTemp, Error, TEXT("UUW_MainMenu::UpdateState_ContinueGameButton: UralJam_GameInstance is invalid!"));
 	}
-}
+}*/
 
 // Decoupling(отвязка) from delegates -------------------------------------------------------------------------------------------------------
 
@@ -98,10 +99,10 @@ void UUW_MainMenu::DecouplingAll_forDelegate()
 		{
 			UralJam_GameInstance->OnLevelLoadedEvent.RemoveDynamic(this, &UUW_MainMenu::UpdateState_StartNewGameButton);
 		}
-		if (UralJam_GameInstance->OnLevelLoadedEvent.IsAlreadyBound(this, &UUW_MainMenu::UpdateState_ContinueGameButton))
+		/*if (UralJam_GameInstance->OnLevelLoadedEvent.IsAlreadyBound(this, &UUW_MainMenu::UpdateState_ContinueGameButton))
 		{
 			UralJam_GameInstance->OnLevelLoadedEvent.RemoveDynamic(this, &UUW_MainMenu::UpdateState_ContinueGameButton);
-		}
+		}*/
 	}
 	else
 	{
@@ -118,7 +119,7 @@ void UUW_MainMenu::OnStartNewGameButtonClicked()
 	if (UralJam_GameInstance)
 	{
 		DecouplingAll_forDelegate();
-		UralJam_GameInstance->StartNewGame();
+		UralJam_GameInstance->StartNewSession();
 	}
 	else
 	{
@@ -126,7 +127,7 @@ void UUW_MainMenu::OnStartNewGameButtonClicked()
 	}
 }
 
-
+/*
 void UUW_MainMenu::OnContinueGameButtonClicked()
 {
 	if (UralJam_GameInstance)
@@ -140,7 +141,7 @@ void UUW_MainMenu::OnContinueGameButtonClicked()
 		UE_LOG(LogTemp, Error, TEXT(" UUW_MainMenu::OnContinueGameButtonClicked: UralJam_GameInstance not found!"));
 	}
 
-}
+}*/
 
 void UUW_MainMenu::OnExitGameButtonClicked()
 {
