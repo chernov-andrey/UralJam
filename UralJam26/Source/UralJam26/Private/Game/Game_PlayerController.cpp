@@ -3,10 +3,13 @@
 
 #include "Game\Game_PlayerController.h"
 #include "InputAction.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
+#include "Engine\TargetPoint.h"
+#include "GameFramework/Character.h"
 #include "Kismet\GameplayStatics.h"
 #include "Game\UralJam_GameInstance.h"
 
@@ -24,7 +27,7 @@ void AGame_PlayerController::BeginPlay()
          
             bShowMouseCursor = true;
 
-            UralJam_GameInstance->OnGameStartedEvent.AddDynamic(this,&ThisClass::ActivationController);      
+            //UralJam_GameInstance->OnGameStartedEvent.AddDynamic(this,&ThisClass::ActivationController);      
         }
 
     }
@@ -32,7 +35,9 @@ void AGame_PlayerController::BeginPlay()
     {
         UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::BeginPlay: FAIL CAST GameInstance to UralJam_GameInstance!"));
     }
-    
+    Character = GetCharacter();
+    check(Character);
+   
    
     Super::BeginPlay();
 }
@@ -43,27 +48,43 @@ void AGame_PlayerController::BeginPlay()
 
 
 
-void AGame_PlayerController::ActivationController()
+bool AGame_PlayerController::TeleportToTargetPoint(FName Tag_TargetPoint)
 {
-    //Выбрать место
-    if (SubsystemInput)
+    if (!Tag_TargetPoint.IsValid()) 
     {
-       
+        return false;
     }
+    TArray<AActor*,FDefaultAllocator> allActors;
+ 
+    UGameplayStatics::GetAllActorsOfClassWithTag(this, ATargetPoint::StaticClass(), Tag_TargetPoint, allActors);
+    if (allActors.IsEmpty())
+    {
+        return false;
+    }
+
+    GetPawn()->SetActorLocationAndRotation(allActors[0]->GetActorLocation(), allActors[0]->GetActorRotation());
+    return true;
 }
 
+void AGame_PlayerController::ActivationController()
+{
+    Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+}
+
+void AGame_PlayerController::DeactivationController()
+{
+    Character->GetCharacterMovement()->DisableMovement();
+}
 // Setup Input Component------------------------------------------------------------------------------------------
 
 
 void AGame_PlayerController::SkipAll()
 {
-    UE_LOG(LogTemp, Error, TEXT("SkipAll SkipAll SkipAll SkipAll SkipAll SkipAll"));
     OnSkipCutsceneEvent.Broadcast(true);
 }
 
 void AGame_PlayerController::SkipOne()
 {
-    UE_LOG(LogTemp, Error, TEXT("SkipOne SkipOne SkipOne SkipOne SkipOne SkipOne"));
     OnSkipCutsceneEvent.Broadcast(false);
 }
 
@@ -99,7 +120,6 @@ void AGame_PlayerController::SetupInputComponent()
 
 void AGame_PlayerController::Move(const FInputActionValue& Value)
 {
-    UE_LOG(LogTemp, Error, TEXT("MOVE  MOVE  MOVE  MOVE  MOVE"));
     FVector2D MoveDirect = Value.Get<FVector2D>();
     APawn* PossessedPawn = Cast<APawn>(GetPawn());
     if (PossessedPawn)
@@ -107,8 +127,6 @@ void AGame_PlayerController::Move(const FInputActionValue& Value)
         PossessedPawn->AddMovementInput(PossessedPawn->GetActorRightVector(), MoveDirect.X);
         PossessedPawn->AddMovementInput(PossessedPawn->GetActorForwardVector(), MoveDirect.Y);
     }
-    
-
 }
 void AGame_PlayerController::Look(const FInputActionValue& Value)
 {

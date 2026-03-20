@@ -9,6 +9,7 @@ class UUralJam_GameInstance;
 class UInputAction;
 class UInputMappingContext;
 class UUserWidget;
+class ACharacter;
 class UEnhancedInputLocalPlayerSubsystem;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkipCutscene, bool, skipAll);
@@ -56,15 +57,19 @@ private:
 	UPROPERTY()
 	TObjectPtr<UUralJam_GameInstance>	UralJam_GameInstance;
 
+	ACharacter* Character;
+public:
+
+	UFUNCTION()
+	bool TeleportToTargetPoint(FName Tag_TargetPoint);
 
 	// Management game mod ------------------------------------------------------------------------------------
-	
 
-	
 public:
 	UFUNCTION()
 	void ActivationController();
-
+	UFUNCTION()
+	void DeactivationController();
 private:
 	void OpenClosePauseMenu();
 

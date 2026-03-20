@@ -11,6 +11,7 @@ class USettings_SaveGame;
 class UProgress_SaveGame;
 class AGame_PlayerController;
 class UUW_Cutscene;
+class UUW_SplashScreen;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLevelLoading);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStarted);//игра начинается либо новая либо продолжение, открывается карта
@@ -32,7 +33,10 @@ class URALJAM26_API UUralJam_GameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
-	
+	TMap<EGameState, bool> MapState;
+	void InitMapState();
+
+
 	void SetPlayerController(TObjectPtr<AGame_PlayerController> lPlayerController);
 private:
 	UPROPERTY()
@@ -43,19 +47,15 @@ private:
 	// Splash Screen ------------------------------------------------------------------------------------------
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings Controller Game_PlayerController | Settings view widgets",
-		meta = (ClampMin = "1.0", ClampMax = "15.0",
-			UIMin = "1.0", UIMax = "15.0"))
-	float LifeTime_SplashScreen = 2.0f; 
+
 	
 	UFUNCTION()
 	void CreateSplashScreen_Widget();
 	UFUNCTION()
 	void RemoveSplashScreen_Widget();
 private:
-	FTimerHandle TimerHandle_LifeSplashWidget;
 	UPROPERTY()
-	TObjectPtr<UUserWidget> SplashScreen_Widget;
+	TObjectPtr<UUW_SplashScreen> SplashScreen_Widget;
 
 
 	// Loading Screen ------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ public:
 	UFUNCTION()
 	void RemoveLoadingScreen_Widget();
 private:
-	FTimerHandle TimerHandle_LifeLoadingWidget;
+	
 	UPROPERTY()
 	TObjectPtr<UUserWidget> LoadingScreen_Widget;
 
@@ -111,13 +111,12 @@ public:
 	bool IsGameState_state(EGameState state)const;
 
 	UFUNCTION()
-	void SetGameState_state(EGameState state);
+	void SetGameState_state(EGameState state, bool val);
 
 	UPROPERTY(VisibleAnywhere, Category = "Game | State")
 	EGameState GameState;
 
-	/*UFUNCTION()// процесс запуска ПРОДОЛЖЕНИЯ игровой сессии из сохранения
-	void StartContinueSession(); */
+	
 	
 	UFUNCTION()//процесс запуска НОВОЙ игровой сессии 
 	void StartNewSession();
@@ -140,16 +139,12 @@ public:
 
 
 
-	/*UFUNCTION()
-	bool CanContinueGame()const;*/
-	UFUNCTION()
-	bool CanNewGame()const;
 
 	UPROPERTY(BlueprintAssignable)
 	FLevelLoading OnLevelLoadedEvent;
 
 	UPROPERTY(BlueprintAssignable)
-	FGameStarted OnGameStartedEvent;
+	FGameStarted OnFirstLevelLoadedEvent;
 
 	// Settings ----------------------------------------------------------------------------------------
 public:
@@ -163,16 +158,11 @@ public:
 	void ApplySettings();
 	
 	// Progress ----------------------------------------------------------------------------------------
-public:
-	/*UFUNCTION()
-	void LoadProgress();
 
-	UFUNCTION(BlueprintCallable)
-	void SaveProgress();
-	*/
+	
 
 	// Audio ----------------------------------------------------------------------------------------
-	public:
+public:
 	UFUNCTION(BlueprintCallable, Category = "Game | Settings")
 	void SetMasterVolume(float newVolume);
 
@@ -194,6 +184,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Save/Load")
 	FString SaveSlotSettings = TEXT("Settings");
 
+	UPROPERTY(EditAnywhere, Category = "Game |  Maps")
+	FName TargetPoint_Tag_1;
+
 	// Widget classes ----------------------------------------------------------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
@@ -203,7 +196,7 @@ protected:
 	TSubclassOf<UUserWidget> WidgetType_PauseMenu;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
-	TSubclassOf<UUserWidget> WidgetType_SplashScreen;
+	TSubclassOf<UUW_SplashScreen> WidgetType_SplashScreen;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
 	TSubclassOf<UUserWidget> WidgetType_LoadingScreen;
@@ -229,7 +222,12 @@ private:
 	//Load level ----------------------------------------------------------------------------------------
 	UFUNCTION()
 	void LoadedLevel(int32 Linkage);
-	
+public:
 	UFUNCTION()
+	void ReloadFirstLevel(int32 i);
+private:
+		UFUNCTION()
 	void StartLoadAsyncLevel(FName LevelName, int32 Linkage);
+	UPROPERTY(VisibleAnywhere)
+	ULevelStreaming* Current_StreamingLevel;
 };

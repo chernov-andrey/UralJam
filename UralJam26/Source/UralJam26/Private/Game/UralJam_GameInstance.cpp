@@ -4,7 +4,8 @@
 #include "Game\UralJam_GameInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widgets/UW_Cutscene.h"
-
+#include "Widgets/UW_SplashScreen.h"
+#include "Widgets/UW_LoadingScreen.h"
 #include "Game\Game_PlayerController.h"
 #include "SavesObjects\Progress_SaveGame.h"
 #include "SavesObjects\Settings_SaveGame.h"
@@ -14,11 +15,35 @@
 
 void UUralJam_GameInstance::Init()
 {
+	InitMapState();
 	Super::Init();
-	GameState = EGameState::GS_Starting;
+	SetGameState_state(EGameState::GS_Starting,true);
 	LoadSettings();
-	/*LoadProgress();*/
-	StartLoadAsyncLevel(Level_1_Name, 1);
+
+
+}
+
+void UUralJam_GameInstance::InitMapState()
+{
+	MapState.Add(EGameState::GS_Starting, false);
+	MapState.Add(EGameState::GS_Cutscene, false);
+	MapState.Add(EGameState::GS_InGame, false);
+	MapState.Add(EGameState::GS_Loading, false);
+	MapState.Add(EGameState::GS_MainMenu, false);
+	MapState.Add(EGameState::GS_Paused, false);
+}
+
+// checking Game state -------------------------------------------------------------------------------------------
+
+
+bool UUralJam_GameInstance::IsGameState_state(EGameState State) const
+{
+	return MapState[State];
+}
+
+void UUralJam_GameInstance::SetGameState_state(EGameState State,bool val)
+{
+	MapState.Add( State,val);
 }
 
 void UUralJam_GameInstance::SetPlayerController(TObjectPtr<AGame_PlayerController> lPlayerController)
@@ -51,69 +76,37 @@ void  UUralJam_GameInstance::LoadedLevel(int32 i)
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: function triggered"));
 	FName LoadedLevelName;
 	switch (i) {
-	case 1:
+	case 11:
 		LoadedLevelName = Level_1_Name;
+		if (UGameplayStatics::GetStreamingLevel(GetWorld(), Level_1_Name)->IsLevelLoaded())
+		{
+			OnFirstLevelLoadedEvent.Broadcast();
+		}
 		break;
-	case 2:
+	case 21:
 		LoadedLevelName = Level_2_Name;
 		break;
-	default: 
+	default:
 		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::LoadedLevel: function triggered for unknow Linkage"));
+		return;
 		break;
 	}
-		ULevelStreaming* LevelStreaming = UGameplayStatics::GetStreamingLevel(this, LoadedLevelName);
-		if (LevelStreaming->IsLevelLoaded())
-		{
-			UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is loaded"), *LoadedLevelName.ToString());
-			OnLevelLoadedEvent.Broadcast();
-		}
-}
-
-//PROGRESS  -------------------------------------------------------------------------------------------
-// Загружаем сохраненный прогресс и если есть запись о пршлой игре подгружаем уровень
-/*
-void UUralJam_GameInstance::LoadProgress()
-{
+	ULevelStreaming* LevelStreaming = UGameplayStatics::GetStreamingLevel(GetWorld(), LoadedLevelName);
+	if (LevelStreaming && LevelStreaming->IsLevelLoaded()) 
+	{
+		UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is loaded"), *LoadedLevelName.ToString());
+		LevelStreaming->SetShouldBeVisible(true);	
+		Current_StreamingLevel = LevelStreaming;
+	}
 	
-	if (UGameplayStatics::DoesSaveGameExist(SaveSlotProgress, 0))
-	{
-		Progress = Cast< UProgress_SaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotProgress, 0));
-		if (Progress)
-		{
-			UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadProgress: success load Progress!"));
-
-			FName NameLevel = Progress->LevelForContinue_Name;
-			if (NameLevel == Level_1_Name)
-			{
-				return;
-			}
-			if (NameLevel == Level_2_Name)
-			{
-				StartLoadAsyncLevel(NameLevel, 2);
-				return;
-			}
-			UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::LoadProgress: unknow level name!"));
-		}
-		
-		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::LoadProgress: Error load save Progress! but there save"));
-	}
-	else
-	{
-		Progress = Cast< UProgress_SaveGame>(UGameplayStatics::CreateSaveGameObject(UProgress_SaveGame::StaticClass()));
-
-		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::LoadProgress: fail load Progress!(not found save) "));
-	}
 }
-void UUralJam_GameInstance::SaveProgress() 
-{
-	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::SaveProgress(): TRY SAVEGAME!"));
-	UGameplayStatics::SaveGameToSlot(Progress, SaveSlotProgress, 0);
-}
-*/
+
+
 
 void  UUralJam_GameInstance::LaunchCutscene(TSubclassOf<UUW_Cutscene> ClassCutsceneWidget)
 {
-	SetGameState_state(EGameState::GS_Cutscene);
+	SetGameState_state(EGameState::GS_Cutscene,true);
+	PlayerController->DeactivationController();
 	Cutscene_Widget = Cast<UUW_Cutscene>(CreateWidget(this, ClassCutsceneWidget));
 	Cutscene_Widget->AddToViewport();
 	PlayerController->OnSkipCutsceneEvent.AddDynamic(Cutscene_Widget, &UUW_Cutscene::SkipCutscene);
@@ -124,37 +117,76 @@ void  UUralJam_GameInstance::EndLaunchCutscene(UUW_Cutscene* CutscenePtr)
 {
 	PlayerController->OnSkipCutsceneEvent.RemoveDynamic(CutscenePtr, &UUW_Cutscene::SkipCutscene);
 	CutscenePtr->RemoveFromParent();
-	SetGameState_state(EGameState::GS_InGame);
+	SetGameState_state(EGameState::GS_Cutscene,false);
+	PlayerController->ActivationController();
 }
 
 void  UUralJam_GameInstance::StartPlay() // Начало новой игры
 {
-	PlayerController->ActivationController();
+	OnFirstLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::StartPlay);
+}
+
+void  UUralJam_GameInstance::ReloadFirstLevel(int32 i)
+{
+	if (i == 10)
+	{
+		StartLoadAsyncLevel(Level_1_Name, 11);
+	}
 }
 
 void  UUralJam_GameInstance::StartNewSession() // Начало новой cсессии
 {
 	
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::StartNewSession"));
-	SetGameState_state(EGameState::GS_Loading);
+	
 	LaunchCutscene(WidgetType_1_Cutscene);
 	CreateLoadingScreen_Widget();
+
 	RemoveMainMenu_Widget();
-	
-	ULevelStreaming* LevelStreaming = UGameplayStatics::GetStreamingLevel(this, Level_1_Name);
-	if (LevelStreaming->IsLevelLoaded())
+	RemoveMainMenu_Widget();
+	OnFirstLevelLoadedEvent.AddDynamic(this, &UUralJam_GameInstance::StartPlay);
+	OnFirstLevelLoadedEvent.AddDynamic(this,&UUralJam_GameInstance::RemoveLoadingScreen_Widget);
+	ULevelStreaming* FirstLevelStreaming = UGameplayStatics::GetStreamingLevel(GetWorld(), Level_1_Name);
+
+	if (Current_StreamingLevel == nullptr) // если нет текущего загркженного уровня то просто загружаем первый уровень
 	{
-		UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is loaded"), *Level_1_Name.ToString());
-		LevelStreaming->SetShouldBeVisible(true);		
+		StartLoadAsyncLevel(Level_1_Name, 11);
+	}
+	else  // мы на какомто уровне
+	{
+		
+		if (FirstLevelStreaming->IsLevelLoaded())
+		{
+			check(FirstLevelStreaming == Current_StreamingLevel);
+			Current_StreamingLevel = nullptr;
+			
+			FLatentActionInfo LatentActionInfo;
+			LatentActionInfo.ExecutionFunction = "ReloadFirstLevel";
+			LatentActionInfo.CallbackTarget = this;
+			LatentActionInfo.Linkage = 10;
+			LatentActionInfo.UUID = GetUniqueID();
+			UGameplayStatics::UnloadStreamLevel(GetWorld(), Level_1_Name, LatentActionInfo, true);
+		}
+		else  // мы не на 1 уровне
+		{
+			if (Current_StreamingLevel->IsLevelLoaded())
+			{
+				StartLoadAsyncLevel(Level_1_Name, 11);
+				UGameplayStatics::UnloadStreamLevel(GetWorld(), Current_StreamingLevel->GetFName(), FLatentActionInfo(), true);
+				Current_StreamingLevel = nullptr;
+			}
+			else 
+			{
+					check(false&& "UUralJam_GameInstance::StartNewSession: CurrentLevel != nuulptr but CurrentLevel not load ");
+			}
+		}
+	}
+
+	if (!PlayerController->TeleportToTargetPoint(TargetPoint_Tag_1))
+	{
+		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::StartNewSession  -> PlayerController->TeleportToTargetPoint(TargetPoint_Tag_1)   -  FAIL"));
 	}
 }
-
-/*
-void UUralJam_GameInstance::StartContinueSession()
-{
-	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::StartContinueGame"));
-
-}*/
 
 
 
@@ -224,52 +256,8 @@ float UUralJam_GameInstance::GetMasterVolume()const
 }
 
 
-// checking the readiness of levels -------------------------------------------------------------------------------------------
- 
-/*
-bool UUralJam_GameInstance::CanContinueGame() const
-{
-	if (Progress)
-	{
-		if (!Progress->bIsNewGame) 
-		{		
-			FName NameLevel = Progress->LevelForContinue_Name;		
-			ULevelStreaming* LevelStreaming = UGameplayStatics::GetStreamingLevel(this, NameLevel);
-			if (LevelStreaming->IsLevelLoaded())
-			{
-				return true;
-				UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::CanContinueGame: Can continue game! "));
-			}	
-		}
-	}	
-
-	UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::CanContinueGame: Can't continue game! "));
-	return false;
-}*/
-bool UUralJam_GameInstance::CanNewGame() const
-{
-	ULevelStreaming* LevelStreaming = UGameplayStatics::GetStreamingLevel(this, Level_1_Name);
-	if (LevelStreaming->IsLevelLoaded())
-	{
-		UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::CanContinueGame: Can continue game! "));
-		return true;
-	}
-	return false;
-}
 
 
-// checking Game state -------------------------------------------------------------------------------------------
-
-
-bool UUralJam_GameInstance::IsGameState_state(EGameState State) const
-{
-	return( GameState == State);
-}
-
-void UUralJam_GameInstance::SetGameState_state(EGameState State) 
-{
-	GameState = State;
-}
 
 
 // Loading Screen ------------------------------------------------------------------------------------------
@@ -277,12 +265,12 @@ void UUralJam_GameInstance::SetGameState_state(EGameState State)
 
 void UUralJam_GameInstance::CreateLoadingScreen_Widget()
 {
-	if (!TimerHandle_LifeLoadingWidget.IsValid())
+	SetGameState_state(EGameState::GS_Loading, true);
+	if (LoadingScreen_Widget==nullptr)
 	{
 		check(WidgetType_LoadingScreen);
 		LoadingScreen_Widget = CreateWidget(this, WidgetType_LoadingScreen);
-		LoadingScreen_Widget->AddToViewport();
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_LifeLoadingWidget, this, &UUralJam_GameInstance::RemoveLoadingScreen_Widget, MinLifeTime_LoadingScreen, false);
+		LoadingScreen_Widget->AddToViewport();	
 	}
 	else
 	{
@@ -291,15 +279,15 @@ void UUralJam_GameInstance::CreateLoadingScreen_Widget()
 }
 void UUralJam_GameInstance::RemoveLoadingScreen_Widget()
 {
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_LifeLoadingWidget);
+	OnFirstLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::RemoveLoadingScreen_Widget);
+
 	if (LoadingScreen_Widget)
 	{
-		LoadingScreen_Widget->RemoveFromParent();
+		Cast< UUW_LoadingScreen>(LoadingScreen_Widget)->Deferred_RemoveFromParent();
+	
+		LoadingScreen_Widget = nullptr;
 	}
-
-	SetGameState_state(EGameState::GS_InGame);
-
-	OnGameStartedEvent.Broadcast();
+	SetGameState_state(EGameState::GS_Loading, false);
 }
 
 
@@ -311,30 +299,18 @@ void UUralJam_GameInstance::RemoveLoadingScreen_Widget()
 
 void UUralJam_GameInstance::CreateSplashScreen_Widget()
 {
-	if ( !TimerHandle_LifeSplashWidget.IsValid())
-	{
 		check(WidgetType_SplashScreen);
 
-		SplashScreen_Widget = CreateWidget(this, WidgetType_SplashScreen);
+		SplashScreen_Widget = Cast<UUW_SplashScreen>(CreateWidget(this, WidgetType_SplashScreen));
 		SplashScreen_Widget->AddToViewport();
-
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_LifeSplashWidget, this, &UUralJam_GameInstance::RemoveSplashScreen_Widget, LifeTime_SplashScreen, false);	
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::CreateLoadingScreen_Widget: It cannot be completed now!"));
-	}
+		SplashScreen_Widget->OnCloseSplashScreenEvent.AddDynamic(this, &UUralJam_GameInstance::RemoveSplashScreen_Widget);
 }
 void UUralJam_GameInstance::RemoveSplashScreen_Widget()
 {
-	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_LifeSplashWidget);
 	if (SplashScreen_Widget)
 	{
 		SplashScreen_Widget->RemoveFromParent();
-	}
-
-	SetGameState_state(EGameState::GS_MainMenu);
-	
+	}	
 }
 
 
@@ -342,27 +318,25 @@ void UUralJam_GameInstance::RemoveSplashScreen_Widget()
 
 
 void UUralJam_GameInstance::OpenClosePauseMenu()
-{/*
-	if (IsPaused())
+{
+	if (IsGameState_state(EGameState::GS_Paused))
 	{
-		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : Pause = false"));
-		SetPause(false);
-		if (HiddenPauseMenu())
-		{
-			SetInputMode(FInputModeGameOnly());
-			bShowMouseCursor = false;
-		}
+		SetGameState_state(EGameState::GS_Paused,false);
+		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : New game state - GS_InGame"));
+		
+		PlayerController->SetPause(false);
+		
+		HiddenPauseMenu();	
 	}
-	else
+	else 
 	{
-		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : Pause = true"));
-		SetPause(true);
-		if (ShowPauseMenu())
-		{
-			SetInputMode(FInputModeGameAndUI());
-			bShowMouseCursor = true;
-		}
-	}*/
+		SetGameState_state(EGameState::GS_Paused,true);
+		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : New game state - GS_Paused"));
+		
+		PlayerController->SetPause(true);
+		
+		ShowPauseMenu();
+	}
 }
 void UUralJam_GameInstance::HiddenPauseMenu()
 {
