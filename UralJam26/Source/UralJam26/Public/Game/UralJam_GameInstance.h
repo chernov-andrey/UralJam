@@ -9,6 +9,9 @@
 class UUserWidget;
 class USettings_SaveGame;
 class UProgress_SaveGame;
+class AGame_PlayerController;
+class UUW_Cutscene;
+class UUW_SplashScreen;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLevelLoading);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStarted);//игра начинается либо новая либо продолжение, открывается карта
@@ -18,9 +21,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStarted);//игра начинается либо новая ли
 	{
 		GS_Starting,
 		GS_MainMenu,
-		GS_LoadingLevel,
+		GS_Loading,
 		GS_InGame,
-		GS_Paused
+		GS_Paused,
+		GS_Cutscene
 	};
 
 
@@ -29,24 +33,51 @@ class URALJAM26_API UUralJam_GameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
+	TMap<EGameState, bool> MapState;
+	void InitMapState();
+
+
+	void SetPlayerController(TObjectPtr<AGame_PlayerController> lPlayerController);
+private:
+	UPROPERTY()
+	TObjectPtr<AGame_PlayerController> PlayerController;
+
+
 
 	// Splash Screen ------------------------------------------------------------------------------------------
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings Controller Game_PlayerController | Settings view widgets",
-		meta = (ClampMin = "1.0", ClampMax = "15.0",
-			UIMin = "1.0", UIMax = "15.0"))
-	float LifeTime_SplashScreen = 2.0f; //Время существования splash screen widget
+public:
+
 	
 	UFUNCTION()
 	void CreateSplashScreen_Widget();
 	UFUNCTION()
 	void RemoveSplashScreen_Widget();
 private:
-	FTimerHandle TimerHandle_LifeTemporaryWidget;
 	UPROPERTY()
-	TObjectPtr<UUserWidget> SplashScreen_Widget;
+	TObjectPtr<UUW_SplashScreen> SplashScreen_Widget;
+
+
+	// Loading Screen ------------------------------------------------------------------------------------------
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings Controller Game_PlayerController | Settings view widgets",
+		meta = (ClampMin = "1.0", ClampMax = "15.0",
+			UIMin = "1.0", UIMax = "15.0"))
+	float MinLifeTime_LoadingScreen = 2.0f; 
+
+	UFUNCTION()
+	void CreateLoadingScreen_Widget();
+	UFUNCTION()
+	void RemoveLoadingScreen_Widget();
+private:
+	
+	UPROPERTY()
+	TObjectPtr<UUserWidget> LoadingScreen_Widget;
+
 
 	// Pause Menu ------------------------------------------------------------------------------------------
+
 
 public:
 	UFUNCTION()
@@ -61,6 +92,7 @@ private:
 	void ShowPauseMenu();
 
 	// Main Menu ------------------------------------------------------------------------------------------
+
 public:
 	UFUNCTION()
 	void CreateMainMenu_Widget();
@@ -79,36 +111,43 @@ public:
 	bool IsGameState_state(EGameState state)const;
 
 	UFUNCTION()
-	void SetGameState_state(EGameState state);
+	void SetGameState_state(EGameState state, bool val);
 
 	UPROPERTY(VisibleAnywhere, Category = "Game | State")
 	EGameState GameState;
 
-	UFUNCTION()
-	void StartContinueGame();
 	
-	UFUNCTION()
-	void StartNewGame();
 	
+	UFUNCTION()//процесс запуска НОВОЙ игровой сессии 
+	void StartNewSession();
+	
+	UFUNCTION()// Создаем виджет катсцены 
+	void LaunchCutscene(TSubclassOf<UUW_Cutscene> ClassCutsceneWidget);
+	UFUNCTION()
+	void EndLaunchCutscene(UUW_Cutscene* CutscenePtr);
+private:
+	UPROPERTY()
+	TObjectPtr<UUW_Cutscene> Cutscene_Widget;
+
+public:
+
+	UFUNCTION() // Запуск Физики активация контроллера
+	void StartPlay();
 
 	virtual void Init() override;
 
 
 
 
-	UFUNCTION()
-	bool CanContinueGame()const;
-	UFUNCTION()
-	bool CanNewGame()const;
 
 	UPROPERTY(BlueprintAssignable)
 	FLevelLoading OnLevelLoadedEvent;
 
 	UPROPERTY(BlueprintAssignable)
-	FGameStarted OnGameStartedEvent;
+	FGameStarted OnFirstLevelLoadedEvent;
 
 	// Settings ----------------------------------------------------------------------------------------
-	
+public:
 	UFUNCTION(BlueprintCallable, Category = "Game | Save/Load")
 	void SaveSettings();
 
@@ -119,16 +158,11 @@ public:
 	void ApplySettings();
 	
 	// Progress ----------------------------------------------------------------------------------------
+
 	
-	UFUNCTION()
-	void LoadProgress();
-
-	UFUNCTION(BlueprintCallable)
-	void SaveProgress();
-
 
 	// Audio ----------------------------------------------------------------------------------------
-	
+public:
 	UFUNCTION(BlueprintCallable, Category = "Game | Settings")
 	void SetMasterVolume(float newVolume);
 
@@ -150,6 +184,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Save/Load")
 	FString SaveSlotSettings = TEXT("Settings");
 
+	UPROPERTY(EditAnywhere, Category = "Game |  Maps")
+	FName TargetPoint_Tag_1;
+
 	// Widget classes ----------------------------------------------------------------------------------------
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
@@ -159,12 +196,13 @@ protected:
 	TSubclassOf<UUserWidget> WidgetType_PauseMenu;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
-	TSubclassOf<UUserWidget> WidgetType_SplashScreen;
+	TSubclassOf<UUW_SplashScreen> WidgetType_SplashScreen;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
 	TSubclassOf<UUserWidget> WidgetType_LoadingScreen;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
+	TSubclassOf<UUW_Cutscene> WidgetType_1_Cutscene;
 
 
 
@@ -184,7 +222,12 @@ private:
 	//Load level ----------------------------------------------------------------------------------------
 	UFUNCTION()
 	void LoadedLevel(int32 Linkage);
-	
+public:
 	UFUNCTION()
+	void ReloadFirstLevel(int32 i);
+private:
+		UFUNCTION()
 	void StartLoadAsyncLevel(FName LevelName, int32 Linkage);
+	UPROPERTY(VisibleAnywhere)
+	ULevelStreaming* Current_StreamingLevel;
 };

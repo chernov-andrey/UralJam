@@ -27,6 +27,15 @@ void UUW_PauseMenu::NativeConstruct()
 	{
 		SoundVolumeSlider->OnValueChanged.AddDynamic(this, &UUW_PauseMenu::OnMasterVolumeChanged);
 	}
+	
+	if (OkayButton)
+	{
+		OkayButton->OnClicked.AddDynamic(this, &UUW_PauseMenu::OnOkayButtonClicked);
+	}
+	if (CancelButton)
+	{
+		CancelButton->OnClicked.AddDynamic(this, &UUW_PauseMenu::OnCancelButtonClicked);
+	}
 
 	UralJam_GameInstance = Cast<UUralJam_GameInstance>(GetGameInstance());
 	if (UralJam_GameInstance)
@@ -36,15 +45,27 @@ void UUW_PauseMenu::NativeConstruct()
 }
 void UUW_PauseMenu::OnStartNewGameButtonClicked()
 {
+	ShowDialog();
+}
+void UUW_PauseMenu::OnOkayButtonClicked()
+{
 	if (UralJam_GameInstance)
 	{
-		UralJam_GameInstance->StartNewGame();
+		
+		UralJam_GameInstance->StartNewSession();
+		UralJam_GameInstance->OpenClosePauseMenu();
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT(" UUW_MainMenu::OnStartNewGameButtonClicked: UralJam_GameInstance not found!"));
 	}
+
 }
+void UUW_PauseMenu::OnCancelButtonClicked()
+{
+	HiddenDialog();
+}
+
 void UUW_PauseMenu::OnClouseMenuButtonClicked()
 {
 	if (UralJam_GameInstance)

@@ -26,6 +26,25 @@ private:
 	UFUNCTION()
 	void OnStartNewGameButtonClicked();
 
+	// Cancel button  --------------------------------------------------------------------------
+	UPROPERTY(meta = (BindWidget))
+	UButton* CancelButton;
+	UFUNCTION()
+	void OnCancelButtonClicked();
+	
+	// Okay button  --------------------------------------------------------------------------
+	UPROPERTY(meta = (BindWidget))
+	UButton* OkayButton;
+	UFUNCTION()
+	void OnOkayButtonClicked();
+
+public:
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowDialog();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void HiddenDialog();
+
 	// ClouseMenuButton --------------------------------------------------------------------------
 	UPROPERTY(meta = (BindWidget))
 	UButton* ClouseMenuButton;

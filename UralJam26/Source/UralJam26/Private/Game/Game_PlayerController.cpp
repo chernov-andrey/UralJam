@@ -3,10 +3,13 @@
 
 #include "Game\Game_PlayerController.h"
 #include "InputAction.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
+#include "Engine\TargetPoint.h"
+#include "GameFramework/Character.h"
 #include "Kismet\GameplayStatics.h"
 #include "Game\UralJam_GameInstance.h"
 
@@ -17,18 +20,25 @@ void AGame_PlayerController::BeginPlay()
     {
         if (UralJam_GameInstance->IsGameState_state(EGameState::GS_Starting)) 
         {
+            UralJam_GameInstance->SetPlayerController(this);
+
             UralJam_GameInstance->CreateMainMenu_Widget();
             UralJam_GameInstance->CreateSplashScreen_Widget();
+         
+            bShowMouseCursor = true;
 
-            UralJam_GameInstance->OnGameStartedEvent.AddDynamic(this,&ThisClass::ActivationController);      
-            
+            //UralJam_GameInstance->OnGameStartedEvent.AddDynamic(this,&ThisClass::ActivationController);      
         }
 
-    }else
+    }
+    else
     {
         UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::BeginPlay: FAIL CAST GameInstance to UralJam_GameInstance!"));
     }
-    
+    Character = GetCharacter();
+    check(Character);
+   
+   
     Super::BeginPlay();
 }
 
@@ -36,36 +46,56 @@ void AGame_PlayerController::BeginPlay()
 // Management game mod  ------------------------------------------------------------------------------------------
 
 
-void AGame_PlayerController::SetGameMod_InMenu()
-{
-    DisableInput(this);
-    SetInputMode(FInputModeGameAndUI());
-    bShowMouseCursor = true;
-}
 
-void AGame_PlayerController::SetGameMod_InGame()
+
+bool AGame_PlayerController::TeleportToTargetPoint(FName Tag_TargetPoint)
 {
-    EnableInput(this);
-    SetInputMode(FInputModeGameOnly());
-    bShowMouseCursor = true;
+    if (!Tag_TargetPoint.IsValid()) 
+    {
+        return false;
+    }
+    TArray<AActor*,FDefaultAllocator> allActors;
+ 
+    UGameplayStatics::GetAllActorsOfClassWithTag(this, ATargetPoint::StaticClass(), Tag_TargetPoint, allActors);
+    if (allActors.IsEmpty())
+    {
+        return false;
+    }
+
+    GetPawn()->SetActorLocationAndRotation(allActors[0]->GetActorLocation(), allActors[0]->GetActorRotation());
+    return true;
 }
 
 void AGame_PlayerController::ActivationController()
 {
-    //Выбрать место
-
+    Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 }
 
+void AGame_PlayerController::DeactivationController()
+{
+    Character->GetCharacterMovement()->DisableMovement();
+}
 // Setup Input Component------------------------------------------------------------------------------------------
 
+
+void AGame_PlayerController::SkipAll()
+{
+    OnSkipCutsceneEvent.Broadcast(true);
+}
+
+void AGame_PlayerController::SkipOne()
+{
+    OnSkipCutsceneEvent.Broadcast(false);
+}
 
 void AGame_PlayerController::SetupInputComponent()
 {
     Super::SetupInputComponent();
-    if (UEnhancedInputLocalPlayerSubsystem* Subsystem =
-        ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+    SubsystemInput = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+    if (SubsystemInput)
     {
-        Subsystem->AddMappingContext(MappingContext, 0);
+        SubsystemInput->AddMappingContext(MappingContext_Game, 0);
+        SubsystemInput->AddMappingContext(MappingContext_Menu, 1);    
     }
     if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
     {
@@ -73,6 +103,9 @@ void AGame_PlayerController::SetupInputComponent()
         EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AGame_PlayerController::Move);
         EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AGame_PlayerController::Look);
         EnhancedInputComponent->BindAction(IA_Pause, ETriggerEvent::Triggered, this, &AGame_PlayerController::OpenClosePauseMenu);
+       
+        EnhancedInputComponent->BindAction(IA_Skip_All, ETriggerEvent::Triggered, this, &AGame_PlayerController::SkipAll);
+        EnhancedInputComponent->BindAction(IA_Skip_One, ETriggerEvent::Triggered, this, &AGame_PlayerController::SkipOne);
     }
     else
     {
@@ -94,8 +127,6 @@ void AGame_PlayerController::Move(const FInputActionValue& Value)
         PossessedPawn->AddMovementInput(PossessedPawn->GetActorRightVector(), MoveDirect.X);
         PossessedPawn->AddMovementInput(PossessedPawn->GetActorForwardVector(), MoveDirect.Y);
     }
-    
-
 }
 void AGame_PlayerController::Look(const FInputActionValue& Value)
 {
