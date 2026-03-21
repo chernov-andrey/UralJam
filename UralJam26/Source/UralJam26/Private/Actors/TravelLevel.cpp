@@ -44,6 +44,6 @@ void ATravelLevel::OnTriggered(UPrimitiveComponent* OverlappedComponent,
 	bool bFromSweep,
 	const FHitResult& SweepResult) 
 {
-	GameInstance->
+	//GameInstance->
 }
 

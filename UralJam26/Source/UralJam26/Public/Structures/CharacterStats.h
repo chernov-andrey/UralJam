@@ -7,22 +7,31 @@
 #include "CharacterStats.generated.h"
 
 USTRUCT(BlueprintType)
-struct FCharacterStats : public FTableRowBase
+struct FVitalityProperty : public FTableRowBase
 {
 	GENERATED_BODY()
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float MaxHealth = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float MaxStamina = 100.0f;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float StaminaRecovery = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	int LimitOfCriticalWounds = 1;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
+	float Armor = 0.0f;
+
+};
+
+USTRUCT(BlueprintType)
+struct FAttackProperty : public FTableRowBase
+{
+	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float Attack_Damage = 1.0f;
 
@@ -38,18 +47,47 @@ struct FCharacterStats : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float CriticalDamage_Chance = 20.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float Armor = 0.0f;
+};
 
+USTRUCT(BlueprintType)
+struct FMovementProperty : public FTableRowBase
+{
+	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float MovementSpeed = 100.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	float AggroRadius = 500.0f;
+	bool IsEnemy = false;
+};
 
+USTRUCT(BlueprintType)
+struct FRangeProperty : public FTableRowBase
+{
+	GENERATED_BODY()
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
 	float Attack_Range = 500.0f;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stats")
-	bool IsEnemy =false;
+	float AggroRadius = 500.0f;
+};
+
+
+USTRUCT(BlueprintType)
+struct FCharacterStats : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVitalityProperty VitalityProperty;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FMovementProperty MovementProperty;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FRangeProperty RangeProperty;
+
+
+	
+
+
+
+
 };

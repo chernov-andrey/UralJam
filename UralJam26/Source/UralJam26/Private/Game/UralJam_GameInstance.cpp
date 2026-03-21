@@ -30,127 +30,129 @@ void UUralJam_GameInstance::SetPlayerController(TObjectPtr<AGame_PlayerControlle
 
 
 
-//Load level  -------------------------------------------------------------------------------------------
+//Load level  -----------------------------------------------------------------------------------------------
 
-void UUralJam_GameInstance::StartLoadAsyncLevel(FName LevelName, int32 Linkage)
+void UUralJam_GameInstance::StartLoadAsyncLevel(FName LevelName)
 {
 	if (UWorld* World = GetWorld())
 	{
-	check(LevelName.IsValid()&&"UUralJam_GameInstance::StartLoadAsyncLevel: Level name is invalid");
-	FLatentActionInfo LatentActionInfo;
-	LatentActionInfo.ExecutionFunction = "LoadedLevel";
-	LatentActionInfo.CallbackTarget = this;
-	LatentActionInfo.Linkage = Linkage;
-	LatentActionInfo.UUID = GetUniqueID();
+		check(LevelName.IsValid() && UGameplayStatics::GetStreamingLevel(World, LevelName) && "UUralJam_GameInstance::StartLoadAsyncLevel: Level name is invalid");
+	
+		FLatentActionInfo LatentActionInfo;
+		LatentActionInfo.ExecutionFunction = "LoadedLevel";
+		LatentActionInfo.CallbackTarget = this;
+		LatentActionInfo.Linkage = Levels_is_Linkage.Find(LevelName);
+		LatentActionInfo.UUID = GetUniqueID();
 
-		 UGameplayStatics::LoadStreamLevel(World, LevelName, false, false, LatentActionInfo);
+		UGameplayStatics::LoadStreamLevel(World, LevelName, false, false, LatentActionInfo);
 		 UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::StartLoadAsyncLevel:Start load level -%s!"), *LevelName.ToString());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::StartLoadAsyncLevel: GetWorld()- FAIL!"));
 	}
 }
 
 // Level is loaded  -------------------------------------------------------------------------------------------
 
-void  UUralJam_GameInstance::LoadedLevel(int32 i)
+void  UUralJam_GameInstance::LoadedLevel(int32 Linkage)
 {
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: function triggered"));
-	FName LoadedLevelName;
-	switch (i) {
-	case 11:
-		LoadedLevelName = Level_1_Name;
-		if (UGameplayStatics::GetStreamingLevel(GetWorld(), Level_1_Name)->IsLevelLoaded())
+	
+	if (Levels_is_Linkage.IsValidIndex(Linkage))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::LoadedLevel: invalid index for Levels-is_linkage"));
+	}
+	Current_UseStreamingLevel = UGameplayStatics::GetStreamingLevel(GetWorld(), Levels_is_Linkage[0]);
+	if (Current_UseStreamingLevel && Current_UseStreamingLevel->IsLevelLoaded())
+	{
+		UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is loaded"), *Levels_is_Linkage[0].ToString());
+		Current_UseStreamingLevel->SetShouldBeVisible(true);
+		OnLevelLoadedEvent.Broadcast(Levels_is_Linkage[0]);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is not found or level is not loaded"),*Levels_is_Linkage[0].ToString());
+	}
+	
+}
+
+
+
+
+void  UUralJam_GameInstance::StartPlay_NewLevel(FName NewLevelName) // Ќачало новой игры
+{
+	//OnFirstLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::StartPlay_NewLevel);
+	auto index =Levels_is_Linkage.Find(NewLevelName);
+	RemoveLoadingScreen_Widget();
+	if (WidgetTypes_Cutscenes.IsValidIndex(index))
+	{
+		if (WidgetTypes_Cutscenes[index] != nullptr)
 		{
-			OnFirstLevelLoadedEvent.Broadcast();
-		}
-		break;
-	case 21:
-		LoadedLevelName = Level_2_Name;
-		break;
-	default:
-		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::LoadedLevel: function triggered for unknow Linkage"));
-		return;
-		break;
-	}
-	ULevelStreaming* LevelStreaming = UGameplayStatics::GetStreamingLevel(GetWorld(), LoadedLevelName);
-	if (LevelStreaming && LevelStreaming->IsLevelLoaded()) 
-	{
-		UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is loaded"), *LoadedLevelName.ToString());
-		LevelStreaming->SetShouldBeVisible(true);	
-		Current_StreamingLevel = LevelStreaming;
-	}
-	
-}
-
-
-
-
-void  UUralJam_GameInstance::StartPlay() // Ќачало новой игры
-{
-	OnFirstLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::StartPlay);
-}
-void  UUralJam_GameInstance::ReloadFirstLevel(int32 i)
-{
-	if (i == 10)
-	{
-		StartLoadAsyncLevel(Level_1_Name, 11);
-	}
-}
-
-void  UUralJam_GameInstance::StartNewSession() // Ќачало новой cсессии
-{
-	
-	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::StartNewSession"));
-	
-	LaunchCutscene(WidgetType_1_Cutscene);
-	CreateLoadingScreen_Widget();
-
-	RemoveMainMenu_Widget();
-	RemoveMainMenu_Widget();
-	OnFirstLevelLoadedEvent.AddDynamic(this, &UUralJam_GameInstance::StartPlay);
-	OnFirstLevelLoadedEvent.AddDynamic(this,&UUralJam_GameInstance::RemoveLoadingScreen_Widget);
-	ULevelStreaming* FirstLevelStreaming = UGameplayStatics::GetStreamingLevel(GetWorld(), Level_1_Name);
-
-	if (Current_StreamingLevel == nullptr) // если нет текущего загркженного уровн€ то просто загружаем первый уровень
-	{
-		StartLoadAsyncLevel(Level_1_Name, 11);
-	}
-	else  // мы на какомто уровне
-	{
+			LaunchCutscene(WidgetTypes_Cutscenes[index]);
 		
-		if (FirstLevelStreaming->IsLevelLoaded())
-		{
-			check(FirstLevelStreaming == Current_StreamingLevel);
-			Current_StreamingLevel = nullptr;
-			
-			FLatentActionInfo LatentActionInfo;
-			LatentActionInfo.ExecutionFunction = "ReloadFirstLevel";
-			LatentActionInfo.CallbackTarget = this;
-			LatentActionInfo.Linkage = 10;
-			LatentActionInfo.UUID = GetUniqueID();
-			UGameplayStatics::UnloadStreamLevel(GetWorld(), Level_1_Name, LatentActionInfo, true);
-		}
-		else  // мы не на 1 уровне
-		{
-			if (Current_StreamingLevel->IsLevelLoaded())
-			{
-				StartLoadAsyncLevel(Level_1_Name, 11);
-				UGameplayStatics::UnloadStreamLevel(GetWorld(), Current_StreamingLevel->GetFName(), FLatentActionInfo(), true);
-				Current_StreamingLevel = nullptr;
-			}
-			else 
-			{
-					check(false&& "UUralJam_GameInstance::StartNewSession: CurrentLevel != nuulptr but CurrentLevel not load ");
-			}
 		}
 	}
-
 	if (!PlayerController->TeleportToTargetPoint(TargetPoint_Tag_1))
 	{
 		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::StartNewSession  -> PlayerController->TeleportToTargetPoint(TargetPoint_Tag_1)   -  FAIL"));
 	}
 }
-c
-{
 
+
+
+
+void  UUralJam_GameInstance::Load_NewLevel(FName NewLevelName)// загружаем уровень когда очистили от старого
+{
+	OnLevelLoadedEvent.AddDynamic(this, &UUralJam_GameInstance::StartPlay_NewLevel);
+	StartLoadAsyncLevel(NewLevelName);
+	
+}
+
+void UUralJam_GameInstance::OnUnloadLevel(int32 Linkage)
+{
+	if (Levels_is_Linkage.IsValidIndex(Linkage))
+	{
+		Load_NewLevel(Levels_is_Linkage[Linkage]);			
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::OnUnloadLevel:  Invalid index for Levels_is_Linkage"));
+	}
+}
+
+
+void  UUralJam_GameInstance::Launch_NewLevel(FName NewLevelName) // start transition level
+{
+	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::PlayNewlevel"));
+	CreateLoadingScreen_Widget();
+	if(MainMenu_Widget!= nullptr)
+	{
+		RemoveMainMenu_Widget();
+	}
+	
+	if (Current_UseStreamingLevel != nullptr)
+	{
+		FLatentActionInfo LatentActionInfo;
+		LatentActionInfo.ExecutionFunction = "OnUnloadLevel";  /////  
+		LatentActionInfo.CallbackTarget = this;
+		LatentActionInfo.Linkage = Levels_is_Linkage.Find(NewLevelName);
+		LatentActionInfo.UUID = GetUniqueID();
+		if ( Current_UseStreamingLevel->IsLevelLoaded())
+		{
+			UGameplayStatics::UnloadStreamLevel(GetWorld(), Current_UseStreamingLevel->GetFName(), LatentActionInfo, true);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT(" UUralJam_GameInstance::Launch_NewLevel: Current_UseStreamingLevel - is not nullptr! But *Current_UseStreamingLevel is not loaded!"));
+			Load_NewLevel(NewLevelName);
+		}
+			Current_UseStreamingLevel = nullptr;
+	}
+	else 
+	{
+		Load_NewLevel(NewLevelName);
+	}
 
 }
 
@@ -158,6 +160,10 @@ c
 
 //=============================================================================================================================================================
 
+void UUralJam_GameInstance::StartNewSession()
+{
+	Launch_NewLevel(Levels_is_Linkage[0]);
+}
 
 // Game STATE -------------------------------------------------------------------------------------------
 
@@ -281,7 +287,7 @@ void UUralJam_GameInstance::CreateLoadingScreen_Widget()
 	{
 		check(WidgetType_LoadingScreen);
 		LoadingScreen_Widget = CreateWidget(this, WidgetType_LoadingScreen);
-		LoadingScreen_Widget->AddToViewport();	
+		LoadingScreen_Widget->AddToViewport(5);	
 	}
 	else
 	{
