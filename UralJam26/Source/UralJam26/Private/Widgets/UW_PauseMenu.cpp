@@ -47,13 +47,18 @@ void UUW_PauseMenu::OnStartNewGameButtonClicked()
 {
 	ShowDialog();
 }
+void UUW_PauseMenu::ClosePauseMenu()
+{
+	UralJam_GameInstance->OpenClosePauseMenu();
+}
+
 void UUW_PauseMenu::OnOkayButtonClicked()
 {
 	if (UralJam_GameInstance)
 	{
 		
 		UralJam_GameInstance->StartNewSession();
-		UralJam_GameInstance->OpenClosePauseMenu();
+		
 	}
 	else
 	{
@@ -68,14 +73,7 @@ void UUW_PauseMenu::OnCancelButtonClicked()
 
 void UUW_PauseMenu::OnClouseMenuButtonClicked()
 {
-	if (UralJam_GameInstance)
-	{
-		UralJam_GameInstance->OpenClosePauseMenu();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT(" UUW_MainMenu::OnClouseMenuButtonClicked: UralJam_GameInstance not found!"));
-	}
+
 }
 void UUW_PauseMenu::OnExitGameButtonClicked()
 {

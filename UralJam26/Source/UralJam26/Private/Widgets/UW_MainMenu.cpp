@@ -10,10 +10,6 @@ void UUW_MainMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (StartNewGameButton)
-	{
-		StartNewGameButton->OnClicked.AddDynamic(this, &UUW_MainMenu::OnStartNewGameButtonClicked);
-	}
 	if (ExitGameButton)
 	{
 		ExitGameButton->OnClicked.AddDynamic(this, &UUW_MainMenu::OnExitGameButtonClicked);
@@ -41,7 +37,7 @@ void UUW_MainMenu::NativeConstruct()
 // Updates state buttons -------------------------------------------------------------------------------------------------------
 
 
-void UUW_MainMenu::OnStartNewGameButtonClicked()
+void UUW_MainMenu::StartNewGame()
 {
 	if (UralJam_GameInstance)
 	{
@@ -49,7 +45,7 @@ void UUW_MainMenu::OnStartNewGameButtonClicked()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT(" UUW_MainMenu: UralJam_GameInstance not found!"));
+		UE_LOG(LogTemp, Error, TEXT(" UUW_MainMenu::StartNewGame: UralJam_GameInstance not found!"));
 	}
 }
 
