@@ -59,8 +59,10 @@ bool AGame_PlayerController::TeleportToTargetPoint(FName Tag_TargetPoint)
     {
         return false;
     }
+    SetControlRotation(Rotator );
+    GetPawn()->SetActorLocation(allActors[0]->GetActorLocation());
+    GetPawn()->SetActorRotation(Rotator);
 
-    GetPawn()->SetActorLocationAndRotation(allActors[0]->GetActorLocation(), allActors[0]->GetActorRotation());
     return true;
 }
 
@@ -92,9 +94,9 @@ void AGame_PlayerController::SetupInputComponent()
     SubsystemInput = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
     if (SubsystemInput)
     {
-        SubsystemInput->AddMappingContext(MappingContext_Char_Hero_2, 0);
-        SubsystemInput->AddMappingContext(MappingContext_Char, 0);
+        SubsystemInput->AddMappingContext(MappingContext_Char, 2);
         SubsystemInput->AddMappingContext(MappingContext_Char_Hero_1, 0);
+        SubsystemInput->AddMappingContext(MappingContext_Char_Hero_2, 0);
         SubsystemInput->AddMappingContext(MappingContext_Menu, 1);
      
     }
@@ -102,7 +104,7 @@ void AGame_PlayerController::SetupInputComponent()
     {
         UE_LOG(LogTemp, Display, TEXT("AGame_PlayerController::SetupInputComponent  is Success!"))
         EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AGame_PlayerController::Move);
-        EnhancedInputComponent->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AGame_PlayerController::Attack);
+        EnhancedInputComponent->BindAction(IA_Attack, ETriggerEvent::Completed, this, &AGame_PlayerController::Attacks);
         EnhancedInputComponent->BindAction(IA_BlockAttack, ETriggerEvent::Triggered, this, &AGame_PlayerController::BlockAttack);
         EnhancedInputComponent->BindAction(IA_AltAttack, ETriggerEvent::Triggered, this, &AGame_PlayerController::AltAttack);
         EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &AGame_PlayerController::Jump);
@@ -130,7 +132,7 @@ void AGame_PlayerController::Move(const FInputActionValue& Value)
     V2.Y=  Value.Get<FVector2D>().Y;
     Character->Move_Character(V2);
 }
-void AGame_PlayerController::Attack(const FInputActionValue& Value)
+void AGame_PlayerController::Attacks(const FInputActionValue& Value)
 {
     Character->Attack_Character(Value.Get<bool>());
 }

@@ -20,7 +20,7 @@ AA_Initiator_Cutscene::AA_Initiator_Cutscene()
 	
 	BillboardComponent = CreateDefaultSubobject<UBillboardComponent>("BillboardComponent", false);
 	check(BillboardComponent);
-	BillboardComponent->AttachToComponent(SphereComponent,FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	BillboardComponent->SetupAttachment(SphereComponent); 
 }
 
 
