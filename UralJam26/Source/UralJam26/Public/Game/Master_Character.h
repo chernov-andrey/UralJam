@@ -16,6 +16,23 @@ public:
 	// Sets default values for this character's properties
 	AMaster_Character();
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void Move_Character(FVector2D InputValue);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Jump_Character(bool InputValue);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void AltJump_Character(bool InputValue);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Attack_Character(bool InputValue);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void AltAttack_Character(bool InputValue);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Block_Character(bool InputValue);
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "Character Stats")
 	FCharacterStats Stats;

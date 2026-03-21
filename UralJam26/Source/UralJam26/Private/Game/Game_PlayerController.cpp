@@ -11,6 +11,7 @@
 #include "Engine\TargetPoint.h"
 #include "GameFramework/Character.h"
 #include "Kismet\GameplayStatics.h"
+#include "Game\Master_Character.h"
 #include "Game\UralJam_GameInstance.h"
 
 void AGame_PlayerController::BeginPlay()
@@ -25,9 +26,7 @@ void AGame_PlayerController::BeginPlay()
             UralJam_GameInstance->CreateMainMenu_Widget();
             UralJam_GameInstance->CreateSplashScreen_Widget();
          
-            bShowMouseCursor = true;
-
-            //UralJam_GameInstance->OnGameStartedEvent.AddDynamic(this,&ThisClass::ActivationController);      
+            bShowMouseCursor = true;    
         }
 
     }
@@ -35,10 +34,9 @@ void AGame_PlayerController::BeginPlay()
     {
         UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::BeginPlay: FAIL CAST GameInstance to UralJam_GameInstance!"));
     }
-    Character = GetCharacter();
+    Character =Cast<AMaster_Character>( GetCharacter());
     check(Character);
-   
-   
+  
     Super::BeginPlay();
 }
 
@@ -94,16 +92,23 @@ void AGame_PlayerController::SetupInputComponent()
     SubsystemInput = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
     if (SubsystemInput)
     {
-        SubsystemInput->AddMappingContext(MappingContext_Game, 0);
-        SubsystemInput->AddMappingContext(MappingContext_Menu, 1);    
+        SubsystemInput->AddMappingContext(MappingContext_Char_Hero_2, 0);
+        SubsystemInput->AddMappingContext(MappingContext_Char, 0);
+        SubsystemInput->AddMappingContext(MappingContext_Char_Hero_1, 0);
+        SubsystemInput->AddMappingContext(MappingContext_Menu, 1);
+     
     }
     if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
     {
         UE_LOG(LogTemp, Display, TEXT("AGame_PlayerController::SetupInputComponent  is Success!"))
         EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AGame_PlayerController::Move);
-        EnhancedInputComponent->BindAction(IA_Look, ETriggerEvent::Triggered, this, &AGame_PlayerController::Look);
+        EnhancedInputComponent->BindAction(IA_Attack, ETriggerEvent::Triggered, this, &AGame_PlayerController::Attack);
+        EnhancedInputComponent->BindAction(IA_BlockAttack, ETriggerEvent::Triggered, this, &AGame_PlayerController::BlockAttack);
+        EnhancedInputComponent->BindAction(IA_AltAttack, ETriggerEvent::Triggered, this, &AGame_PlayerController::AltAttack);
+        EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &AGame_PlayerController::Jump);
+        EnhancedInputComponent->BindAction(IA_AltJump, ETriggerEvent::Triggered, this, &AGame_PlayerController::AltJump);
+
         EnhancedInputComponent->BindAction(IA_Pause, ETriggerEvent::Triggered, this, &AGame_PlayerController::OpenClosePauseMenu);
-       
         EnhancedInputComponent->BindAction(IA_Skip_All, ETriggerEvent::Triggered, this, &AGame_PlayerController::SkipAll);
         EnhancedInputComponent->BindAction(IA_Skip_One, ETriggerEvent::Triggered, this, &AGame_PlayerController::SkipOne);
     }
@@ -120,20 +125,35 @@ void AGame_PlayerController::SetupInputComponent()
 
 void AGame_PlayerController::Move(const FInputActionValue& Value)
 {
-    FVector2D MoveDirect = Value.Get<FVector2D>();
-    APawn* PossessedPawn = Cast<APawn>(GetPawn());
-    if (PossessedPawn)
-    {
-        PossessedPawn->AddMovementInput(PossessedPawn->GetActorRightVector(), MoveDirect.X);
-        PossessedPawn->AddMovementInput(PossessedPawn->GetActorForwardVector(), MoveDirect.Y);
-    }
+    FVector2D V2;
+    V2.X = Value.Get<FVector2D>().X;
+    V2.Y=  Value.Get<FVector2D>().Y;
+    Character->Move_Character(V2);
 }
-void AGame_PlayerController::Look(const FInputActionValue& Value)
+void AGame_PlayerController::Attack(const FInputActionValue& Value)
 {
-    FVector2D LookDirect = Value.Get<FVector2D>();
-
-
+    Character->Attack_Character(Value.Get<bool>());
 }
+void AGame_PlayerController::BlockAttack(const FInputActionValue& Value)
+{
+    Character->Block_Character(Value.Get<bool>());
+}
+
+void AGame_PlayerController::AltAttack(const FInputActionValue& Value)
+{
+    Character->AltAttack_Character(Value.Get<bool>());
+}
+
+void AGame_PlayerController::Jump(const FInputActionValue& Value)
+{
+    Character->Jump_Character(Value.Get<bool>());
+}
+
+void AGame_PlayerController::AltJump(const FInputActionValue& Value)
+{
+    Character->AltJump_Character(Value.Get<bool>());
+}
+
 
 void AGame_PlayerController::OpenClosePauseMenu()
 {
