@@ -17,7 +17,7 @@ ATravelLevel::ATravelLevel()
 
 	BillboardComponent = CreateDefaultSubobject<UBillboardComponent>("BillboardComponent", false);
 	check(BillboardComponent);
-	BillboardComponent->AttachToComponent(SphereComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	BillboardComponent->SetupAttachment(SphereComponent);
 }
 
 // Called when the game starts or when spawned

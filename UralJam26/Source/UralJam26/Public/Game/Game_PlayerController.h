@@ -25,6 +25,10 @@ private:
 	UPROPERTY()
 	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> SubsystemInput;
 public:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "AAAAAAAAAAAAAAAAAAAAAAAA")
+	FRotator Rotator;
+
+
 	UPROPERTY(EditAnywhere, Category = "Settings Controller Game_PlayerController | Input Settings")
 	TObjectPtr<UInputAction> IA_Move;
 	
@@ -101,7 +105,7 @@ private:
 	void Move(const FInputActionValue& Value);
 
 	UFUNCTION()
-	void Attack(const FInputActionValue& Value);
+	void Attacks(const FInputActionValue& Value);
 
 	UFUNCTION()
 	void BlockAttack(const FInputActionValue& Value);
