@@ -19,12 +19,13 @@ class URALJAM26_API UUW_MainMenu : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;
 	
+	UFUNCTION(BlueprintCallable)
+	void StartNewGame();
+
 private:
 	// NewGameButton --------------------------------------------------------------------------
 	UPROPERTY(meta = (BindWidget))
 	UButton* StartNewGameButton;
-	UFUNCTION()
-	void OnStartNewGameButtonClicked();
 	
 
 

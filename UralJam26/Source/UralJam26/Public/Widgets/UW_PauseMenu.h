@@ -45,6 +45,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void HiddenDialog();
 
+	UFUNCTION(BlueprintCallable)
+	void ClosePauseMenu();
+
 	// ClouseMenuButton --------------------------------------------------------------------------
 	UPROPERTY(meta = (BindWidget))
 	UButton* ClouseMenuButton;

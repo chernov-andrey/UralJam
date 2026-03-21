@@ -22,34 +22,13 @@ void UUralJam_GameInstance::Init()
 
 
 }
-
-void UUralJam_GameInstance::InitMapState()
-{
-	MapState.Add(EGameState::GS_Starting, false);
-	MapState.Add(EGameState::GS_Cutscene, false);
-	MapState.Add(EGameState::GS_InGame, false);
-	MapState.Add(EGameState::GS_Loading, false);
-	MapState.Add(EGameState::GS_MainMenu, false);
-	MapState.Add(EGameState::GS_Paused, false);
-}
-
-// checking Game state -------------------------------------------------------------------------------------------
-
-
-bool UUralJam_GameInstance::IsGameState_state(EGameState State) const
-{
-	return MapState[State];
-}
-
-void UUralJam_GameInstance::SetGameState_state(EGameState State,bool val)
-{
-	MapState.Add( State,val);
-}
-
 void UUralJam_GameInstance::SetPlayerController(TObjectPtr<AGame_PlayerController> lPlayerController)
 {
 	PlayerController = lPlayerController;
 }
+
+
+
 
 //Load level  -------------------------------------------------------------------------------------------
 
@@ -103,29 +82,11 @@ void  UUralJam_GameInstance::LoadedLevel(int32 i)
 
 
 
-void  UUralJam_GameInstance::LaunchCutscene(TSubclassOf<UUW_Cutscene> ClassCutsceneWidget)
-{
-	SetGameState_state(EGameState::GS_Cutscene,true);
-	PlayerController->DeactivationController();
-	Cutscene_Widget = Cast<UUW_Cutscene>(CreateWidget(this, ClassCutsceneWidget));
-	Cutscene_Widget->AddToViewport();
-	PlayerController->OnSkipCutsceneEvent.AddDynamic(Cutscene_Widget, &UUW_Cutscene::SkipCutscene);
-	
-	Cutscene_Widget->OnEndCutsceneEvent.AddDynamic(this, &UUralJam_GameInstance::EndLaunchCutscene);
-}
-void  UUralJam_GameInstance::EndLaunchCutscene(UUW_Cutscene* CutscenePtr)
-{
-	PlayerController->OnSkipCutsceneEvent.RemoveDynamic(CutscenePtr, &UUW_Cutscene::SkipCutscene);
-	CutscenePtr->RemoveFromParent();
-	SetGameState_state(EGameState::GS_Cutscene,false);
-	PlayerController->ActivationController();
-}
 
 void  UUralJam_GameInstance::StartPlay() // Начало новой игры
 {
 	OnFirstLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::StartPlay);
 }
-
 void  UUralJam_GameInstance::ReloadFirstLevel(int32 i)
 {
 	if (i == 10)
@@ -187,8 +148,181 @@ void  UUralJam_GameInstance::StartNewSession() // Начало новой cсессии
 		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::StartNewSession  -> PlayerController->TeleportToTargetPoint(TargetPoint_Tag_1)   -  FAIL"));
 	}
 }
+c
+{
 
 
+}
+
+
+
+//=============================================================================================================================================================
+
+
+// Game STATE -------------------------------------------------------------------------------------------
+
+void UUralJam_GameInstance::InitMapState()
+{
+	MapState.Add(EGameState::GS_Starting, false);
+	MapState.Add(EGameState::GS_Cutscene, false);
+	MapState.Add(EGameState::GS_InGame, false);
+	MapState.Add(EGameState::GS_Loading, false);
+	MapState.Add(EGameState::GS_MainMenu, false);
+	MapState.Add(EGameState::GS_Paused, false);
+}
+bool UUralJam_GameInstance::IsGameState_state(EGameState State) const
+{
+	return MapState[State];
+}
+void UUralJam_GameInstance::SetGameState_state(EGameState State,bool val)
+{
+	MapState.Add( State,val);
+}
+
+
+
+
+//=============================================================================================================================================================
+
+
+// Main menu ------------------------------------------------------------------------------------------
+
+void UUralJam_GameInstance::CreateMainMenu_Widget()
+{
+	check(WidgetType_MainMenu);
+
+	MainMenu_Widget = CreateWidget(this, WidgetType_MainMenu);
+	MainMenu_Widget->AddToViewport();
+}
+void UUralJam_GameInstance::RemoveMainMenu_Widget()
+{
+	if (MainMenu_Widget)
+	{
+		MainMenu_Widget->RemoveFromParent();
+	}
+}
+
+// Pause menu ------------------------------------------------------------------------------------------
+
+void UUralJam_GameInstance::OpenClosePauseMenu()
+{
+	if (IsGameState_state(EGameState::GS_Paused))
+	{
+		SetGameState_state(EGameState::GS_Paused,false);
+		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : New game state - GS_InGame"));
+		
+		PlayerController->SetPause(false);
+		
+		HiddenPauseMenu();	
+	}
+	else 
+	{
+		SetGameState_state(EGameState::GS_Paused,true);
+		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : New game state - GS_Paused"));
+		
+		PlayerController->SetPause(true);
+		
+		ShowPauseMenu();
+	}
+}
+void UUralJam_GameInstance::HiddenPauseMenu()
+{
+	if (PauseMenu)
+	{
+		PauseMenu->RemoveFromParent();
+		PauseMenu = nullptr;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT(" UUralJam_GameInstance::HiddenPauseMenu: attempt to close a missing widget"));
+	}
+}
+void UUralJam_GameInstance::ShowPauseMenu()
+{
+	check(WidgetType_PauseMenu);
+	if (!PauseMenu)
+	{
+		PauseMenu = CreateWidget<UUserWidget>(this, WidgetType_PauseMenu);
+	}
+	if (PauseMenu)
+	{
+		PauseMenu->AddToViewport();
+	}
+	else
+	{
+		UE_LOG(LogTemp, Display, TEXT(" UUralJam_GameInstance::ShowPauseMenu: couldn't create widget PauseMenu"));
+	}
+}
+
+// Splash Screen ------------------------------------------------------------------------------------------
+
+void UUralJam_GameInstance::CreateSplashScreen_Widget()
+{
+		check(WidgetType_SplashScreen);
+
+		SplashScreen_Widget = Cast<UUW_SplashScreen>(CreateWidget(this, WidgetType_SplashScreen));
+		SplashScreen_Widget->AddToViewport();
+		SplashScreen_Widget->OnCloseSplashScreenEvent.AddDynamic(this, &UUralJam_GameInstance::RemoveSplashScreen_Widget);
+}
+void UUralJam_GameInstance::RemoveSplashScreen_Widget()
+{
+	if (SplashScreen_Widget)
+	{
+		SplashScreen_Widget->RemoveFromParent();
+	}	
+}
+
+// Loading Screen ------------------------------------------------------------------------------------------
+
+void UUralJam_GameInstance::CreateLoadingScreen_Widget()
+{
+	SetGameState_state(EGameState::GS_Loading, true);
+	if (LoadingScreen_Widget==nullptr)
+	{
+		check(WidgetType_LoadingScreen);
+		LoadingScreen_Widget = CreateWidget(this, WidgetType_LoadingScreen);
+		LoadingScreen_Widget->AddToViewport();	
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::CreateLoadingScreen_Widget: It cannot be completed now!"));
+	}
+}
+void UUralJam_GameInstance::RemoveLoadingScreen_Widget()
+{
+	OnFirstLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::RemoveLoadingScreen_Widget);
+
+	if (LoadingScreen_Widget)
+	{
+		Cast< UUW_LoadingScreen>(LoadingScreen_Widget)->Deferred_RemoveFromParent();
+	
+		LoadingScreen_Widget = nullptr;
+	}
+	SetGameState_state(EGameState::GS_Loading, false);
+}
+
+// Cutscene -------------------------------------------------------------------------------------------
+
+void  UUralJam_GameInstance::LaunchCutscene(TSubclassOf<UUW_Cutscene> ClassCutsceneWidget)
+{
+	SetGameState_state(EGameState::GS_Cutscene,true);
+	PlayerController->DeactivationController();
+	Cutscene_Widget = Cast<UUW_Cutscene>(CreateWidget(this, ClassCutsceneWidget));
+	Cutscene_Widget->AddToViewport();
+	PlayerController->OnSkipCutsceneEvent.AddDynamic(Cutscene_Widget, &UUW_Cutscene::SkipCutscene);
+	
+	Cutscene_Widget->OnEndCutsceneEvent.AddDynamic(this, &UUralJam_GameInstance::EndLaunchCutscene);
+}
+void  UUralJam_GameInstance::EndLaunchCutscene(UUW_Cutscene* CutscenePtr)
+{
+	PlayerController->OnSkipCutsceneEvent.RemoveDynamic(CutscenePtr, &UUW_Cutscene::SkipCutscene);
+	CutscenePtr->RemoveFromParent();
+	SetGameState_state(EGameState::GS_Cutscene,false);
+	PlayerController->ActivationController();
+}
+
+
+//=============================================================================================================================================================
 
 
 // SETTINGS -------------------------------------------------------------------------------------------
@@ -254,135 +388,3 @@ float UUralJam_GameInstance::GetMasterVolume()const
 		return Settings->MasterVolume;
 
 }
-
-
-
-
-
-
-// Loading Screen ------------------------------------------------------------------------------------------
-
-
-void UUralJam_GameInstance::CreateLoadingScreen_Widget()
-{
-	SetGameState_state(EGameState::GS_Loading, true);
-	if (LoadingScreen_Widget==nullptr)
-	{
-		check(WidgetType_LoadingScreen);
-		LoadingScreen_Widget = CreateWidget(this, WidgetType_LoadingScreen);
-		LoadingScreen_Widget->AddToViewport();	
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::CreateLoadingScreen_Widget: It cannot be completed now!"));
-	}
-}
-void UUralJam_GameInstance::RemoveLoadingScreen_Widget()
-{
-	OnFirstLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::RemoveLoadingScreen_Widget);
-
-	if (LoadingScreen_Widget)
-	{
-		Cast< UUW_LoadingScreen>(LoadingScreen_Widget)->Deferred_RemoveFromParent();
-	
-		LoadingScreen_Widget = nullptr;
-	}
-	SetGameState_state(EGameState::GS_Loading, false);
-}
-
-
-
-// Splash Screen ------------------------------------------------------------------------------------------
-
-
-
-
-void UUralJam_GameInstance::CreateSplashScreen_Widget()
-{
-		check(WidgetType_SplashScreen);
-
-		SplashScreen_Widget = Cast<UUW_SplashScreen>(CreateWidget(this, WidgetType_SplashScreen));
-		SplashScreen_Widget->AddToViewport();
-		SplashScreen_Widget->OnCloseSplashScreenEvent.AddDynamic(this, &UUralJam_GameInstance::RemoveSplashScreen_Widget);
-}
-void UUralJam_GameInstance::RemoveSplashScreen_Widget()
-{
-	if (SplashScreen_Widget)
-	{
-		SplashScreen_Widget->RemoveFromParent();
-	}	
-}
-
-
-// Pause menu ------------------------------------------------------------------------------------------
-
-
-void UUralJam_GameInstance::OpenClosePauseMenu()
-{
-	if (IsGameState_state(EGameState::GS_Paused))
-	{
-		SetGameState_state(EGameState::GS_Paused,false);
-		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : New game state - GS_InGame"));
-		
-		PlayerController->SetPause(false);
-		
-		HiddenPauseMenu();	
-	}
-	else 
-	{
-		SetGameState_state(EGameState::GS_Paused,true);
-		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : New game state - GS_Paused"));
-		
-		PlayerController->SetPause(true);
-		
-		ShowPauseMenu();
-	}
-}
-void UUralJam_GameInstance::HiddenPauseMenu()
-{
-	if (PauseMenu)
-	{
-		PauseMenu->RemoveFromParent();
-		PauseMenu = nullptr;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Display, TEXT(" UUralJam_GameInstance::HiddenPauseMenu: attempt to close a missing widget"));
-	}
-}
-void UUralJam_GameInstance::ShowPauseMenu()
-{
-	check(WidgetType_PauseMenu);
-	if (!PauseMenu)
-	{
-		PauseMenu = CreateWidget<UUserWidget>(this, WidgetType_PauseMenu);
-	}
-	if (PauseMenu)
-	{
-		PauseMenu->AddToViewport();
-	}
-	else
-	{
-		UE_LOG(LogTemp, Display, TEXT(" UUralJam_GameInstance::ShowPauseMenu: couldn't create widget PauseMenu"));
-	}
-}
-
-
-// Main menu ------------------------------------------------------------------------------------------
-
-void UUralJam_GameInstance::CreateMainMenu_Widget()
-{
-	check(WidgetType_MainMenu);
-
-	MainMenu_Widget = CreateWidget(this, WidgetType_MainMenu);
-	MainMenu_Widget->AddToViewport();
-}
-
-void UUralJam_GameInstance::RemoveMainMenu_Widget()
-{
-	if (MainMenu_Widget)
-	{
-		MainMenu_Widget->RemoveFromParent();
-	}
-}
-
