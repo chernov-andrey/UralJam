@@ -105,7 +105,8 @@ void AGame_PlayerController::SetupInputComponent()
         UE_LOG(LogTemp, Display, TEXT("AGame_PlayerController::SetupInputComponent  is Success!"))
         EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AGame_PlayerController::Move);
         EnhancedInputComponent->BindAction(IA_Attack, ETriggerEvent::Completed, this, &AGame_PlayerController::Attacks);
-        EnhancedInputComponent->BindAction(IA_BlockAttack, ETriggerEvent::Triggered, this, &AGame_PlayerController::BlockAttack);
+        EnhancedInputComponent->BindAction(IA_BlockAttack, ETriggerEvent::Started, this, &AGame_PlayerController::BlockAttack);
+      
         EnhancedInputComponent->BindAction(IA_AltAttack, ETriggerEvent::Triggered, this, &AGame_PlayerController::AltAttack);
         EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &AGame_PlayerController::Jump);
         EnhancedInputComponent->BindAction(IA_AltJump, ETriggerEvent::Triggered, this, &AGame_PlayerController::AltJump);
@@ -134,7 +135,7 @@ void AGame_PlayerController::Move(const FInputActionValue& Value)
 }
 void AGame_PlayerController::Attacks(const FInputActionValue& Value)
 {
-    Character->Attack_Character(Value.Get<bool>());
+   Character->Attack_Character(Value.Get<bool>());
 }
 void AGame_PlayerController::BlockAttack(const FInputActionValue& Value)
 {

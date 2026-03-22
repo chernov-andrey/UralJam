@@ -59,7 +59,7 @@ void  UUralJam_GameInstance::LoadedLevel(int32 Linkage)
 {
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: function triggered"));
 	
-	if (Levels_is_Linkage.IsValidIndex(Linkage))
+	if (!Levels_is_Linkage.IsValidIndex(Linkage))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::LoadedLevel: invalid index for Levels-is_linkage"));
 	}
@@ -162,7 +162,7 @@ void  UUralJam_GameInstance::Launch_NewLevel(FName NewLevelName) // start transi
 
 void UUralJam_GameInstance::StartNewSession()
 {
-	Launch_NewLevel(Levels_is_Linkage[0]);
+ 	Launch_NewLevel(Levels_is_Linkage[0]);
 }
 
 // Game STATE -------------------------------------------------------------------------------------------
