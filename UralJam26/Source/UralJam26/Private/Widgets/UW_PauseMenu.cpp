@@ -5,38 +5,22 @@
 #include "Game\UralJam_GameInstance.h"
 #include "Components\Button.h"
 #include "Components\Slider.h"
+#include "Widgets\UW_DialogFrame.h"
 #include "Game\Game_PlayerController.h"
 
 void UUW_PauseMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (StartNewGameButton)
-	{
-		StartNewGameButton->OnClicked.AddDynamic(this, &UUW_PauseMenu::OnStartNewGameButtonClicked);
-	}
-	if (ClouseMenuButton)
-	{
-		ClouseMenuButton->OnClicked.AddDynamic(this, &UUW_PauseMenu::OnClouseMenuButtonClicked);
-	}
-	if (ExitGameButton)
-	{
-		ExitGameButton->OnClicked.AddDynamic(this, &UUW_PauseMenu::OnExitGameButtonClicked);
-	}
-	if (SoundVolumeSlider)
-	{
-		SoundVolumeSlider->OnValueChanged.AddDynamic(this, &UUW_PauseMenu::OnMasterVolumeChanged);
-	}
+	check(StartNewGameButton);
+	StartNewGameButton->OnClicked.AddDynamic(this, &UUW_PauseMenu::OnStartNewGameButtonClicked);
+		
+	check(ExitGameButton);
+	ExitGameButton->OnClicked.AddDynamic(this, &UUW_PauseMenu::OnExitGameButtonClicked);
 	
-	if (OkayButton)
-	{
-		OkayButton->OnClicked.AddDynamic(this, &UUW_PauseMenu::OnOkayButtonClicked);
-	}
-	if (CancelButton)
-	{
-		CancelButton->OnClicked.AddDynamic(this, &UUW_PauseMenu::OnCancelButtonClicked);
-	}
-
+	check(SoundVolumeSlider);
+	SoundVolumeSlider->OnValueChanged.AddDynamic(this, &UUW_PauseMenu::OnMasterVolumeChanged);
+	
 	UralJam_GameInstance = Cast<UUralJam_GameInstance>(GetGameInstance());
 	if (UralJam_GameInstance)
 	{
@@ -45,36 +29,38 @@ void UUW_PauseMenu::NativeConstruct()
 }
 void UUW_PauseMenu::OnStartNewGameButtonClicked()
 {
+	check(DialogFrame);
+	DialogFrame->OnReceivedAnswerEvent.AddDynamic(this, &ThisClass::ReceivedAnswer_NewGame);
 	ShowDialog();
 }
+
+
+void UUW_PauseMenu::Pre_ClosePauseMenu_Implementation()
+{
+	ClosePauseMenu();
+}
+
 void UUW_PauseMenu::ClosePauseMenu()
 {
 	UralJam_GameInstance->OpenClosePauseMenu();
 }
 
-void UUW_PauseMenu::OnOkayButtonClicked()
+void UUW_PauseMenu::ReceivedAnswer_NewGame(bool Answer)
 {
-	if (UralJam_GameInstance)
+	check(DialogFrame);
+	DialogFrame->OnReceivedAnswerEvent.RemoveDynamic(this, &ThisClass::ReceivedAnswer_NewGame);
+	if (Answer)
 	{
-		
 		UralJam_GameInstance->StartNewSession();
-		
+		Pre_ClosePauseMenu();
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT(" UUW_MainMenu::OnStartNewGameButtonClicked: UralJam_GameInstance not found!"));
+		HiddenDialog();
 	}
-
-}
-void UUW_PauseMenu::OnCancelButtonClicked()
-{
-	HiddenDialog();
 }
 
-void UUW_PauseMenu::OnClouseMenuButtonClicked()
-{
 
-}
 void UUW_PauseMenu::OnExitGameButtonClicked()
 {
 

@@ -11,6 +11,7 @@ class AGame_PlayerController;
 class UButton;
 class USlider;
 class UUralJam_GameInstance;
+class UUW_DialogFrame;
 
 UCLASS()
 class URALJAM26_API UUW_PauseMenu : public UUserWidget
@@ -23,20 +24,11 @@ private:
 	// NewGameButton  --------------------------------------------------------------------------
 	UPROPERTY(meta = (BindWidget))
 	UButton* StartNewGameButton;
+
 	UFUNCTION()
 	void OnStartNewGameButtonClicked();
 
-	// Cancel button  --------------------------------------------------------------------------
-	UPROPERTY(meta = (BindWidget))
-	UButton* CancelButton;
-	UFUNCTION()
-	void OnCancelButtonClicked();
-	
-	// Okay button  --------------------------------------------------------------------------
-	UPROPERTY(meta = (BindWidget))
-	UButton* OkayButton;
-	UFUNCTION()
-	void OnOkayButtonClicked();
+
 
 public:
 	UFUNCTION(BlueprintImplementableEvent)
@@ -44,15 +36,15 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void HiddenDialog();
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void Pre_ClosePauseMenu();
 
+	
 	UFUNCTION(BlueprintCallable)
 	void ClosePauseMenu();
+	
 
-	// ClouseMenuButton --------------------------------------------------------------------------
-	UPROPERTY(meta = (BindWidget))
-	UButton* ClouseMenuButton;
-	UFUNCTION()
-	void OnClouseMenuButtonClicked();
 	
 	//ExitGameButton --------------------------------------------------------------------------
 	UPROPERTY(meta = (BindWidget))
@@ -62,11 +54,16 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	USlider* SoundVolumeSlider;
+	
+	UPROPERTY(meta = (BindWidget))
+	UUW_DialogFrame* DialogFrame;
 
 	UFUNCTION()
 	void OnMasterVolumeChanged(float Value);
+	
+	UFUNCTION()
+	void ReceivedAnswer_NewGame(bool Answer);
 
-
-	UPROPERTY()
+		UPROPERTY()
 	TObjectPtr<UUralJam_GameInstance> UralJam_GameInstance;
 };

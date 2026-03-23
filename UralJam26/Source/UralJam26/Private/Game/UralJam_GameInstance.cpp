@@ -82,7 +82,7 @@ void  UUralJam_GameInstance::LoadedLevel(int32 Linkage)
 
 void  UUralJam_GameInstance::StartPlay_NewLevel(FName NewLevelName) // Начало новой игры
 {
-	//OnFirstLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::StartPlay_NewLevel);
+	OnLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::StartPlay_NewLevel);
 	auto index =Levels_is_Linkage.Find(NewLevelName);
 	RemoveLoadingScreen_Widget();
 	if (WidgetTypes_Cutscenes.IsValidIndex(index))
@@ -252,7 +252,7 @@ void UUralJam_GameInstance::ShowPauseMenu()
 	}
 	if (PauseMenu)
 	{
-		PauseMenu->AddToViewport();
+		PauseMenu->AddToViewport(6);
 	}
 	else
 	{
@@ -267,7 +267,7 @@ void UUralJam_GameInstance::CreateSplashScreen_Widget()
 		check(WidgetType_SplashScreen);
 
 		SplashScreen_Widget = Cast<UUW_SplashScreen>(CreateWidget(this, WidgetType_SplashScreen));
-		SplashScreen_Widget->AddToViewport();
+		SplashScreen_Widget->AddToViewport(10);
 		SplashScreen_Widget->OnCloseSplashScreenEvent.AddDynamic(this, &UUralJam_GameInstance::RemoveSplashScreen_Widget);
 }
 void UUralJam_GameInstance::RemoveSplashScreen_Widget()
