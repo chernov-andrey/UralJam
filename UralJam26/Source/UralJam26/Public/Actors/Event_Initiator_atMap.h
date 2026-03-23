@@ -4,27 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TravelLevel.generated.h"
+#include "Event_Initiator_atMap.generated.h"
 
-class SphereComponent;
+class USphereComponent;
 class UBillboardComponent;
 class UUralJam_GameInstance;
 
 UCLASS()
-class URALJAM26_API ATravelLevel : public AActor
+class URALJAM26_API AEvent_Initiator_atMap : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ATravelLevel();
+	AEvent_Initiator_atMap();
 
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
+	UPROPERTY( BlueprintReadOnly)
 	UUralJam_GameInstance* GameInstance;
 
 public:	
@@ -45,4 +45,8 @@ private:
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult);
+public:
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnTrigger_Character();
+
 };

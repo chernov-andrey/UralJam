@@ -105,8 +105,8 @@ private:
 	void Load_NewLevel(FName NewLevelName);
 	
 
-
-	UFUNCTION()
+public:
+	UFUNCTION(BlueprintCallable)
 	void Launch_NewLevel(FName NewLevelName);
 private:
 	UFUNCTION()
@@ -234,7 +234,7 @@ protected:
 	//--------------------------------------------- Cutscene ---------------------------------------------------------
 
 public:
-	UFUNCTION()// Создаем виджет катсцены 
+	UFUNCTION(BlueprintCallable)// Создаем виджет катсцены 
 	void LaunchCutscene(TSubclassOf<UUW_Cutscene> ClassCutsceneWidget);
 	
 	UFUNCTION()
