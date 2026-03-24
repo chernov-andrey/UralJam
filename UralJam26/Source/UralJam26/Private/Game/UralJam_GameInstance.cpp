@@ -19,8 +19,6 @@ void UUralJam_GameInstance::Init()
 	Super::Init();
 	SetGameState_state(EGameState::GS_Starting,true);
 	LoadSettings();
-
-
 }
 void UUralJam_GameInstance::SetPlayerController(TObjectPtr<AGame_PlayerController> lPlayerController)
 {
@@ -36,7 +34,7 @@ void UUralJam_GameInstance::StartLoadAsyncLevel(FName LevelName)
 {
 	if (UWorld* World = GetWorld())
 	{
-		check(LevelName.IsValid() && UGameplayStatics::GetStreamingLevel(World, LevelName) && "UUralJam_GameInstance::StartLoadAsyncLevel: Level name is invalid");
+		check(LevelName.IsValid() && UGameplayStatics::GetStreamingLevel(World, LevelName) && "UUralJam_GameInstance::StartLoadAsyncLevel: Level name is invalid or level is already uploaded ");
 	
 		FLatentActionInfo LatentActionInfo;
 		LatentActionInfo.ExecutionFunction = "LoadedLevel";
@@ -57,6 +55,8 @@ void UUralJam_GameInstance::StartLoadAsyncLevel(FName LevelName)
 
 void  UUralJam_GameInstance::LoadedLevel(int32 Linkage)
 {
+
+
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: function triggered"));
 	
 	if (!Levels_is_Linkage.IsValidIndex(Linkage))
@@ -97,6 +97,8 @@ void  UUralJam_GameInstance::StartPlay_NewLevel(FName NewLevelName) // Начало но
 	{
 		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::StartNewSession  -> PlayerController->TeleportToTargetPoint(TargetPoint_Tag_1)   -  FAIL"));
 	}
+
+	SetGameState_state(EGameState::GS_LoadingLevel, false);
 }
 
 
@@ -124,6 +126,8 @@ void UUralJam_GameInstance::OnUnloadLevel(int32 Linkage)
 
 void  UUralJam_GameInstance::Launch_NewLevel(FName NewLevelName) // start transition level
 {
+	SetGameState_state(EGameState::GS_LoadingLevel, true);
+
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::PlayNewlevel"));
 	CreateLoadingScreen_Widget();
 	if(MainMenu_Widget!= nullptr)
@@ -175,6 +179,7 @@ void UUralJam_GameInstance::InitMapState()
 	MapState.Add(EGameState::GS_Loading, false);
 	MapState.Add(EGameState::GS_MainMenu, false);
 	MapState.Add(EGameState::GS_Paused, false);
+	MapState.Add(EGameState::GS_LoadingLevel, false);
 }
 bool UUralJam_GameInstance::IsGameState_state(EGameState State) const
 {
@@ -183,6 +188,24 @@ bool UUralJam_GameInstance::IsGameState_state(EGameState State) const
 void UUralJam_GameInstance::SetGameState_state(EGameState State,bool val)
 {
 	MapState.Add( State,val);
+	if (IsGameState_state(EGameState::GS_Cutscene) || IsGameState_state(EGameState::GS_Starting) || IsGameState_state(EGameState::GS_Loading) 
+		|| IsGameState_state(EGameState::GS_MainMenu) || IsGameState_state(EGameState::GS_Paused)|| IsGameState_state(EGameState::GS_LoadingLevel))
+	{
+		if (bIsGameplayMod) 
+		{
+			bIsGameplayMod = false;
+			OnChangedGameStateEvent.Broadcast();
+		}
+	}
+	else
+	{
+		if (!bIsGameplayMod)
+		{
+			bIsGameplayMod = true;
+			OnChangedGameStateEvent.Broadcast();
+		}
+	}
+
 }
 
 
@@ -195,8 +218,9 @@ void UUralJam_GameInstance::SetGameState_state(EGameState State,bool val)
 
 void UUralJam_GameInstance::CreateMainMenu_Widget()
 {
+	SetGameState_state(EGameState::GS_MainMenu, true);
 	check(WidgetType_MainMenu);
-
+	
 	MainMenu_Widget = CreateWidget(this, WidgetType_MainMenu);
 	MainMenu_Widget->AddToViewport();
 }
@@ -206,6 +230,7 @@ void UUralJam_GameInstance::RemoveMainMenu_Widget()
 	{
 		MainMenu_Widget->RemoveFromParent();
 	}
+	SetGameState_state(EGameState::GS_MainMenu, false);
 }
 
 // Pause menu ------------------------------------------------------------------------------------------
@@ -276,6 +301,7 @@ void UUralJam_GameInstance::RemoveSplashScreen_Widget()
 	{
 		SplashScreen_Widget->RemoveFromParent();
 	}	
+	SetGameState_state(EGameState::GS_Starting, false);
 }
 
 // Loading Screen ------------------------------------------------------------------------------------------
@@ -296,7 +322,7 @@ void UUralJam_GameInstance::CreateLoadingScreen_Widget()
 }
 void UUralJam_GameInstance::RemoveLoadingScreen_Widget()
 {
-	OnFirstLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::RemoveLoadingScreen_Widget);
+	
 
 	if (LoadingScreen_Widget)
 	{

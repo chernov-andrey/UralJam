@@ -13,8 +13,7 @@ class AGame_PlayerController;
 class UUW_Cutscene;
 class UUW_SplashScreen;
 
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLevelLoading); // подгружен уровень
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStarted);  //игра начинается либо новая либо продолжение, открывается карта
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FChanged_GS);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLoadedLevel, FName, LevelName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnloadCurrentLevel);
 
@@ -26,7 +25,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnloadCurrentLevel);
 		GS_Loading,
 		GS_InGame,
 		GS_Paused,
-		GS_Cutscene
+		GS_Cutscene,
+		GS_LoadingLevel
 	};
 
 
@@ -44,7 +44,10 @@ private:
 	void InitMapState();
 
 public:
-	UFUNCTION()
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsGameplayMod; // режим имено игры
+
+	UFUNCTION(BlueprintCallable)
 	bool IsGameState_state(EGameState state)const;
 
 	UFUNCTION()
@@ -56,9 +59,8 @@ public:
 //                                              Events
 //============================================================================================================================================
 public:
-
 	UPROPERTY(BlueprintAssignable)
-	FGameStarted OnFirstLevelLoadedEvent;
+	FChanged_GS OnChangedGameStateEvent;
 
 	UPROPERTY(BlueprintAssignable)
 	FLoadedLevel OnLevelLoadedEvent;

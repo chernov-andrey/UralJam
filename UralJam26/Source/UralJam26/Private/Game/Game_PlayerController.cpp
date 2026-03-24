@@ -68,12 +68,16 @@ bool AGame_PlayerController::TeleportToTargetPoint(FName Tag_TargetPoint)
 
 void AGame_PlayerController::ActivationController()
 {
-    Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+    SubsystemInput->AddMappingContext(MappingContext_Char_Hero_2, 3);
+    SubsystemInput->AddMappingContext(MappingContext_Char_Hero_1, 3);
+    SubsystemInput->AddMappingContext(MappingContext_Char, 3);
 }
 
 void AGame_PlayerController::DeactivationController()
 {
-    Character->GetCharacterMovement()->DisableMovement();
+  //  SubsystemInput->RemoveMappingContext(MappingContext_Char);
+  //  SubsystemInput->RemoveMappingContext(MappingContext_Char_Hero_1);
+   // SubsystemInput->RemoveMappingContext(MappingContext_Char_Hero_2);
 }
 // Setup Input Component------------------------------------------------------------------------------------------
 
@@ -81,11 +85,12 @@ void AGame_PlayerController::DeactivationController()
 void AGame_PlayerController::SkipAll()
 {
     OnSkipCutsceneEvent.Broadcast(true);
+
 }
 
 void AGame_PlayerController::SkipOne()
 {
-    OnSkipCutsceneEvent.Broadcast(false);
+   OnSkipCutsceneEvent.Broadcast(false);
 }
 
 void AGame_PlayerController::SetupInputComponent()
@@ -94,18 +99,17 @@ void AGame_PlayerController::SetupInputComponent()
     SubsystemInput = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
     if (SubsystemInput)
     {
-        SubsystemInput->AddMappingContext(MappingContext_Char, 2);
-        SubsystemInput->AddMappingContext(MappingContext_Char_Hero_1, 0);
-        SubsystemInput->AddMappingContext(MappingContext_Char_Hero_2, 0);
-        SubsystemInput->AddMappingContext(MappingContext_Menu, 1);
-     
+      
+        SubsystemInput->AddMappingContext(MappingContext_Menu, 2);
     }
     if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
     {
         UE_LOG(LogTemp, Display, TEXT("AGame_PlayerController::SetupInputComponent  is Success!"))
         EnhancedInputComponent->BindAction(IA_Move, ETriggerEvent::Triggered, this, &AGame_PlayerController::Move);
         EnhancedInputComponent->BindAction(IA_Attack, ETriggerEvent::Completed, this, &AGame_PlayerController::Attacks);
-        EnhancedInputComponent->BindAction(IA_BlockAttack, ETriggerEvent::Started, this, &AGame_PlayerController::BlockAttack);
+
+        EnhancedInputComponent->BindAction(IA_BlockAttack, ETriggerEvent::Triggered, this, &AGame_PlayerController::BlockAttack);
+        EnhancedInputComponent->BindAction(IA_BlockAttack, ETriggerEvent::Completed, this, &AGame_PlayerController::BlockAttack);
       
         EnhancedInputComponent->BindAction(IA_AltAttack, ETriggerEvent::Triggered, this, &AGame_PlayerController::AltAttack);
         EnhancedInputComponent->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &AGame_PlayerController::Jump);
