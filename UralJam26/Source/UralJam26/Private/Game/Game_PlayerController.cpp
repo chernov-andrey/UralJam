@@ -75,9 +75,9 @@ void AGame_PlayerController::ActivationController()
 
 void AGame_PlayerController::DeactivationController()
 {
-  //  SubsystemInput->RemoveMappingContext(MappingContext_Char);
-  //  SubsystemInput->RemoveMappingContext(MappingContext_Char_Hero_1);
-   // SubsystemInput->RemoveMappingContext(MappingContext_Char_Hero_2);
+    SubsystemInput->RemoveMappingContext(MappingContext_Char);
+    SubsystemInput->RemoveMappingContext(MappingContext_Char_Hero_1);
+    SubsystemInput->RemoveMappingContext(MappingContext_Char_Hero_2);
 }
 // Setup Input Component------------------------------------------------------------------------------------------
 
