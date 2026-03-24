@@ -67,7 +67,9 @@ void  UUralJam_GameInstance::LoadedLevel(int32 Linkage)
 	if (Current_UseStreamingLevel && Current_UseStreamingLevel->IsLevelLoaded())
 	{
 		UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is loaded"), *Levels_is_Linkage[0].ToString());
+		Current_UseStreamingLevel->SetShouldBeLoaded(true);
 		Current_UseStreamingLevel->SetShouldBeVisible(true);
+		
 		OnLevelLoadedEvent.Broadcast(Levels_is_Linkage[0]);
 	}
 	else
