@@ -11,6 +11,7 @@
 #include "SavesObjects\Settings_SaveGame.h"
 #include "Engine/LevelStreaming.h"
 #include "Blueprint/UserWidget.h"
+#include "Game\Master_Character.h"
 #include "Sound/SoundClass.h"
 
 void UUralJam_GameInstance::Init()
@@ -85,20 +86,24 @@ void  UUralJam_GameInstance::LoadedLevel(int32 Linkage)
 void  UUralJam_GameInstance::StartPlay_NewLevel(FName NewLevelName) // Начало новой игры
 {
 	OnLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::StartPlay_NewLevel);
-	auto index =Levels_is_Linkage.Find(NewLevelName);
-	RemoveLoadingScreen_Widget();
-	if (WidgetTypes_Cutscenes.IsValidIndex(index))
+	
+	AMaster_Character* Character = Cast<AMaster_Character>(PlayerController->GetCharacter());
+	if (Character)
 	{
-		if (WidgetTypes_Cutscenes[index] != nullptr)
+		check(!Character->DA_events.IsNull() && "UUralJam_GameInstance::StartPlay_NewLevel: AMaster_Character->DA_events - is NULL")
 		{
-			LaunchCutscene(WidgetTypes_Cutscenes[index]);
-		
+			LaunchCutscene(Character->DA_events->ListCutscenes[ECutsceneID::Lvl_1_Cut_1]);
 		}
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Error, TEXT(" UUralJam_GameInstance::StartPlay_NewLevel:  Cast<AMaster_Character>(PlayerController->GetCharacter()   -  FAIL"));
 	}
 	if (!PlayerController->TeleportToTargetPoint(TargetPoint_Tag_1))
 	{
 		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::StartNewSession  -> PlayerController->TeleportToTargetPoint(TargetPoint_Tag_1)   -  FAIL"));
 	}
+	RemoveLoadingScreen_Widget();
 
 	SetGameState_state(EGameState::GS_LoadingLevel, false);
 }
@@ -341,6 +346,8 @@ void  UUralJam_GameInstance::LaunchCutscene(TSubclassOf<UUW_Cutscene> ClassCutsc
 {
 	SetGameState_state(EGameState::GS_Cutscene,true);
 	PlayerController->DeactivationController();
+	check(ClassCutsceneWidget && "UUralJam_GameInstance::LaunchCutscene: ClassCutsceneWidget - is invalid");
+	
 	Cutscene_Widget = Cast<UUW_Cutscene>(CreateWidget(this, ClassCutsceneWidget));
 	Cutscene_Widget->AddToViewport();
 	PlayerController->OnSkipCutsceneEvent.AddDynamic(Cutscene_Widget, &UUW_Cutscene::SkipCutscene);

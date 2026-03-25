@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Structures/CharacterStats.h"
 #include "Intrfaces/Managment_Missions.h"
+#include "Data/PDA_Character_Events.h"
 #include "Master_Character.generated.h"
 
 UCLASS(Abstract)
@@ -14,6 +15,9 @@ class URALJAM26_API AMaster_Character : public ACharacter, public IManagment_Mis
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TObjectPtr<UPDA_Character_Events> DA_events;
+
 	// Sets default values for this character's properties
 	AMaster_Character();
 	
