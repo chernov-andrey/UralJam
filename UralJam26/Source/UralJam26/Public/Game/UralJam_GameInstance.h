@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Intrfaces/Managment_Missions.h"
 #include "UralJam_GameInstance.generated.h"
 
 class UUserWidget;
@@ -31,7 +32,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnloadCurrentLevel);
 
 
 UCLASS()
-class URALJAM26_API UUralJam_GameInstance : public UGameInstance
+class URALJAM26_API UUralJam_GameInstance : public UGameInstance, public IManagment_Missions
 {
 	GENERATED_BODY()
 
@@ -84,7 +85,7 @@ public:
 	
 	//void
 	
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AGame_PlayerController> PlayerController;
 
 private:
@@ -294,6 +295,19 @@ private:
 	TObjectPtr<UProgress_SaveGame> Progress;
 
 	//--------------------------------------------------- Load level --------------------------------------
+
+
+
+	//============================================================================================================================================
+	//                                             INTERFACES
+	//============================================================================================================================================
+
+	//--------------------------------------------- Management_Missions --------------------------------------
+	
+public:
+virtual void CreateNewMission_Implementation(const FString& String) override;
+
+
 
 
 };
