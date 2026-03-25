@@ -356,6 +356,7 @@ void  UUralJam_GameInstance::EndLaunchCutscene(UUW_Cutscene* CutscenePtr)
 }
 
 
+
 //=============================================================================================================================================================
 
 
@@ -421,4 +422,28 @@ float UUralJam_GameInstance::GetMasterVolume()const
 	check(Settings && "UUralJam_GameInstance::GetMasterVolume FALE!")
 		return Settings->MasterVolume;
 
+}
+
+
+//============================================================================================================================================
+//                                             INTERFACES
+//============================================================================================================================================
+
+//--------------------------------------------- Management_Missions --------------------------------------
+
+
+
+void UUralJam_GameInstance::CreateNewMission_Implementation(const FString& String)
+{
+
+	IManagment_Missions* Interface = Cast<IManagment_Missions>(PlayerController);
+	if (Interface)
+	{
+		Interface->Execute_CreateNewMission(PlayerController,String);
+		
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::CreateNewMission: PlayerController hasnt interface  -IManagment_Missions "));
+	}
 }

@@ -2,6 +2,7 @@
 
 
 #include "Game\Master_Character.h"
+
 #include "Intrfaces/Damageable_Interface.h"
 
 // Sets default values
@@ -31,5 +32,9 @@ void AMaster_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+void AMaster_Character::CreateNewMission_Implementation(const FString& String)
+{
+	UE_LOG(LogTemp, Warning, TEXT(" AMaster_Character::CreateNewMission_Implementation: not override"));
 }
 
