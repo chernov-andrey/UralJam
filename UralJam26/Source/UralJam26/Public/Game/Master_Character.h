@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Structures/CharacterStats.h"
+#include "Intrfaces/Managment_Missions.h"
 #include "Master_Character.generated.h"
 
 UCLASS(Abstract)
-class URALJAM26_API AMaster_Character : public ACharacter
+class URALJAM26_API AMaster_Character : public ACharacter, public IManagment_Missions
 {
 	GENERATED_BODY()
 
@@ -46,4 +47,14 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+//============================================================================================================================================
+//                                             INTERFACES
+//============================================================================================================================================
+
+//--------------------------------------------- Management_Missions --------------------------------------
+public:
+
+	virtual void CreateNewMission_Implementation(const FString& String) override;
+
 };

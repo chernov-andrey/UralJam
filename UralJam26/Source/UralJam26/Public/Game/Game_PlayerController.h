@@ -3,6 +3,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Intrfaces/Managment_Missions.h"
 #include "Game_PlayerController.generated.h"
 
 class UUralJam_GameInstance;
@@ -15,11 +16,17 @@ class UEnhancedInputLocalPlayerSubsystem;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkipCutscene, bool, skipAll);
 UCLASS()
-class URALJAM26_API AGame_PlayerController : public APlayerController
+class URALJAM26_API AGame_PlayerController : public APlayerController,public  IManagment_Missions
 {
 	GENERATED_BODY()
 public:
 	FOnSkipCutscene OnSkipCutsceneEvent;
+
+
+
+	UFUNCTION(BlueprintCallable)
+	void CreateNew_Mission();
+
 
 private:
 	UPROPERTY()
@@ -119,4 +126,12 @@ private:
 	UFUNCTION()
 	void AltJump(const FInputActionValue& Value);
 
+
+//============================================================================================================================================
+//                                             INTERFACES
+//============================================================================================================================================
+
+//--------------------------------------------- Management_Missions --------------------------------------
+	
+	virtual void CreateNewMission_Implementation(const FString& String) override;
 };

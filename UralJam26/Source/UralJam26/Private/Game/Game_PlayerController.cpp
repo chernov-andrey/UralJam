@@ -12,6 +12,7 @@
 #include "GameFramework/Character.h"
 #include "Kismet\GameplayStatics.h"
 #include "Game\Master_Character.h"
+#include "Intrfaces/Managment_Missions.h"
 #include "Game\UralJam_GameInstance.h"
 
 void AGame_PlayerController::BeginPlay()
@@ -81,6 +82,12 @@ void AGame_PlayerController::DeactivationController()
 }
 // Setup Input Component------------------------------------------------------------------------------------------
 
+
+void AGame_PlayerController::CreateNew_Mission()
+{
+    
+
+}
 
 void AGame_PlayerController::SkipAll()
 {
@@ -162,6 +169,8 @@ void AGame_PlayerController::AltJump(const FInputActionValue& Value)
 }
 
 
+
+
 void AGame_PlayerController::OpenClosePauseMenu()
 {
     UralJam_GameInstance = Cast<UUralJam_GameInstance>(GetGameInstance());
@@ -175,4 +184,24 @@ void AGame_PlayerController::OpenClosePauseMenu()
     }
 }
 
+//============================================================================================================================================
+//                                             INTERFACES
+//============================================================================================================================================
 
+//--------------------------------------------- Management_Missions --------------------------------------
+
+
+void AGame_PlayerController::CreateNewMission_Implementation(const FString& String)
+{
+    
+    IManagment_Missions* Interface = Cast<IManagment_Missions>(Character);
+    if (Interface)
+    {
+        Interface->Execute_CreateNewMission(Character,String);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::CreateNewMission: PlayerController hasnt interface  -IManagment_Missions "));
+    }
+   
+}
