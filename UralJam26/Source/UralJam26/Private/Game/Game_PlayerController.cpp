@@ -205,3 +205,18 @@ void AGame_PlayerController::CreateNewMission_Implementation(EMissionID ID)
     }
    
 }
+void AGame_PlayerController::CreateQuest_GoTo_Implementation(EMissionID ID, AEvent_Initiator_atMap* InitiatorActor)
+{
+
+    IManagment_Missions* Interface = Cast<IManagment_Missions>(MCharacter);
+    if (Interface)
+    {
+        Interface->Execute_CreateQuest_GoTo(MCharacter, ID, InitiatorActor);
+
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("AGame_PlayerController::CreateQuest_GoTo_Implementation: PlayerController hasnt interface  -IManagment_Missions "));
+    }
+}
+

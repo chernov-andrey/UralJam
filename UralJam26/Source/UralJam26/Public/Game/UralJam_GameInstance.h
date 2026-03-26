@@ -14,6 +14,7 @@ class UProgress_SaveGame;
 class AGame_PlayerController;
 class UUW_Cutscene;
 class UUW_SplashScreen;
+class AEvent_Initiator_atMap;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FChanged_GS);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLoadedLevel, FName, LevelName);
@@ -306,7 +307,7 @@ private:
 	
 public:
 virtual void CreateNewMission_Implementation(EMissionID ID) override;
-
+virtual void CreateQuest_GoTo_Implementation(EMissionID ID, AEvent_Initiator_atMap* InitiatorActor) override;
 
 
 

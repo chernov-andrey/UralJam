@@ -9,6 +9,8 @@
 #include "Data/PDA_Character_Events.h"
 #include "Master_Character.generated.h"
 
+class AEvent_Initiator_atMap;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCompleteQuest, EMissionID, ID);
 
 UCLASS(Abstract)
@@ -64,7 +66,7 @@ public:
 
 //--------------------------------------------- Management_Missions --------------------------------------
 public:
-
 	virtual void CreateNewMission_Implementation(EMissionID ID) override;
+	virtual void CreateQuest_GoTo_Implementation(EMissionID ID, AEvent_Initiator_atMap* InitiatorActor) override;
 
 };

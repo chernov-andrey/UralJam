@@ -10,6 +10,8 @@ class USphereComponent;
 class UBillboardComponent;
 class UUralJam_GameInstance;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerCharacter);
+
 UCLASS()
 class URALJAM26_API AEvent_Initiator_atMap : public AActor
 {
@@ -17,6 +19,9 @@ class URALJAM26_API AEvent_Initiator_atMap : public AActor
 	
 public:	
 	// Sets default values for this actor's properties
+	UPROPERTY(BlueprintCallable,BlueprintAssignable)
+	FTriggerCharacter OnTriggerCharacterEvent;
+	
 	AEvent_Initiator_atMap();
 
 
@@ -48,5 +53,11 @@ private:
 public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnTrigger_Character();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnActivate();
+	
+	UFUNCTION(BlueprintCallable)
+	void Activate();
 
 };
