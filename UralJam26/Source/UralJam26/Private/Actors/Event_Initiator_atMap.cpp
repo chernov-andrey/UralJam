@@ -14,7 +14,7 @@ AEvent_Initiator_atMap::AEvent_Initiator_atMap()
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent", false);
 	check(SphereComponent);
-
+	
 	BillboardComponent = CreateDefaultSubobject<UBillboardComponent>("BillboardComponent", false);
 	check(BillboardComponent);
 	BillboardComponent->SetupAttachment(SphereComponent);
@@ -23,6 +23,7 @@ AEvent_Initiator_atMap::AEvent_Initiator_atMap()
 // Called when the game starts or when spawned
 void AEvent_Initiator_atMap::BeginPlay()
 {
+	SphereComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GameInstance = Cast<UUralJam_GameInstance>(GetGameInstance());
 	check(GameInstance != nullptr);
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &AEvent_Initiator_atMap::OnTriggered);
@@ -47,6 +48,13 @@ void AEvent_Initiator_atMap::OnTriggered(UPrimitiveComponent* OverlappedComponen
 	if (OtherActor == Cast<AActor>(GameInstance->PlayerController->GetCharacter()))
 	{
 		AEvent_Initiator_atMap::OnTrigger_Character();
+		OnTriggerCharacterEvent.Broadcast();
 	}
+}
+
+void  AEvent_Initiator_atMap::Activate()
+{
+	OnActivate();
+	SphereComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 

@@ -12,6 +12,7 @@ class UInputMappingContext;
 class UUserWidget;
 class ACharacter;
 class AMaster_Character;
+class AEvent_Initiator_atMap;
 class UEnhancedInputLocalPlayerSubsystem;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkipCutscene, bool, skipAll);
@@ -134,4 +135,6 @@ private:
 //--------------------------------------------- Management_Missions --------------------------------------
 	
 	virtual void CreateNewMission_Implementation(EMissionID ID) override;
+	virtual void CreateQuest_GoTo_Implementation(EMissionID ID, AEvent_Initiator_atMap* InitiatorActor) override;
+
 };

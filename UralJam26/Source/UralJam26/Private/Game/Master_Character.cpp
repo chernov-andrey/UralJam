@@ -38,3 +38,9 @@ void AMaster_Character::CreateNewMission_Implementation(EMissionID ID)
 	UE_LOG(LogTemp, Warning, TEXT(" AMaster_Character::CreateNewMission_Implementation: not override"));
 }
 
+
+void AMaster_Character::CreateQuest_GoTo_Implementation(EMissionID ID, AEvent_Initiator_atMap* InitiatorActor)
+{
+	UE_LOG(LogTemp, Warning, TEXT(" AMaster_Character::CreateQuest_GoTo_Implementation: not override"));
+}
+
