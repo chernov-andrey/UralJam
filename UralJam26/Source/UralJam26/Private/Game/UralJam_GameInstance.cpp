@@ -11,6 +11,7 @@
 #include "SavesObjects\Settings_SaveGame.h"
 #include "Engine/LevelStreaming.h"
 #include "Blueprint/UserWidget.h"
+#include "Game\Master_Character.h"
 #include "Sound/SoundClass.h"
 
 void UUralJam_GameInstance::Init()
@@ -63,14 +64,15 @@ void  UUralJam_GameInstance::LoadedLevel(int32 Linkage)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::LoadedLevel: invalid index for Levels-is_linkage"));
 	}
-	Current_UseStreamingLevel = UGameplayStatics::GetStreamingLevel(GetWorld(), Levels_is_Linkage[0]);
-	if (Current_UseStreamingLevel && Current_UseStreamingLevel->IsLevelLoaded())
+	Current_UseStreamingLevel = Levels_is_Linkage[Linkage];
+	ULevelStreaming* LevelS	= UGameplayStatics::GetStreamingLevel(GetWorld(), Current_UseStreamingLevel);
+	if (LevelS && LevelS->IsLevelLoaded())
 	{
 		UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is loaded"), *Levels_is_Linkage[0].ToString());
-		Current_UseStreamingLevel->SetShouldBeLoaded(true);
-		Current_UseStreamingLevel->SetShouldBeVisible(true);
+		LevelS->SetShouldBeLoaded(true);
+		LevelS->SetShouldBeVisible(true);
 		
-		OnLevelLoadedEvent.Broadcast(Levels_is_Linkage[0]);
+		OnLevelLoadedEvent.Broadcast(Levels_is_Linkage[Linkage]);
 	}
 	else
 	{
@@ -85,24 +87,15 @@ void  UUralJam_GameInstance::LoadedLevel(int32 Linkage)
 void  UUralJam_GameInstance::StartPlay_NewLevel(FName NewLevelName) // Начало новой игры
 {
 	OnLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::StartPlay_NewLevel);
-	auto index =Levels_is_Linkage.Find(NewLevelName);
+
+	if (!PlayerController->TeleportToTargetPoint(TargetPoint_Tag[Levels_is_Linkage.Find(NewLevelName)]))
+	{
+		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::StartNewSession  -> PlayerController->TeleportToTargetPoint(TargetPoint_Tag[Levels_is_Linkage.Find(NewLevelName)])   -  FAIL"));
+	}
 	RemoveLoadingScreen_Widget();
-	if (WidgetTypes_Cutscenes.IsValidIndex(index))
-	{
-		if (WidgetTypes_Cutscenes[index] != nullptr)
-		{
-			LaunchCutscene(WidgetTypes_Cutscenes[index]);
-		
-		}
-	}
-	if (!PlayerController->TeleportToTargetPoint(TargetPoint_Tag_1))
-	{
-		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::StartNewSession  -> PlayerController->TeleportToTargetPoint(TargetPoint_Tag_1)   -  FAIL"));
-	}
 
 	SetGameState_state(EGameState::GS_LoadingLevel, false);
 }
-
 
 
 
@@ -137,23 +130,27 @@ void  UUralJam_GameInstance::Launch_NewLevel(FName NewLevelName) // start transi
 		RemoveMainMenu_Widget();
 	}
 	
-	if (Current_UseStreamingLevel != nullptr)
+	if (Current_UseStreamingLevel != FName())
 	{
+
 		FLatentActionInfo LatentActionInfo;
 		LatentActionInfo.ExecutionFunction = "OnUnloadLevel";  /////  
 		LatentActionInfo.CallbackTarget = this;
 		LatentActionInfo.Linkage = Levels_is_Linkage.Find(NewLevelName);
 		LatentActionInfo.UUID = GetUniqueID();
-		if ( Current_UseStreamingLevel->IsLevelLoaded())
+		
+		ULevelStreaming* LevelS = UGameplayStatics::GetStreamingLevel(GetWorld(), Current_UseStreamingLevel);
+		
+		if (LevelS->IsLevelLoaded())
 		{
-			UGameplayStatics::UnloadStreamLevel(GetWorld(), Current_UseStreamingLevel->GetFName(), LatentActionInfo, true);
+			UGameplayStatics::UnloadStreamLevel(GetWorld(), Current_UseStreamingLevel, LatentActionInfo, false);
 		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT(" UUralJam_GameInstance::Launch_NewLevel: Current_UseStreamingLevel - is not nullptr! But *Current_UseStreamingLevel is not loaded!"));
 			Load_NewLevel(NewLevelName);
 		}
-			Current_UseStreamingLevel = nullptr;
+			Current_UseStreamingLevel = FName();
 	}
 	else 
 	{
@@ -337,19 +334,38 @@ void UUralJam_GameInstance::RemoveLoadingScreen_Widget()
 
 // Cutscene -------------------------------------------------------------------------------------------
 
-void  UUralJam_GameInstance::LaunchCutscene(TSubclassOf<UUW_Cutscene> ClassCutsceneWidget)
+void  UUralJam_GameInstance::LaunchCutscene(ECutsceneID ID)
 {
 	SetGameState_state(EGameState::GS_Cutscene,true);
 	PlayerController->DeactivationController();
-	Cutscene_Widget = Cast<UUW_Cutscene>(CreateWidget(this, ClassCutsceneWidget));
-	Cutscene_Widget->AddToViewport();
-	PlayerController->OnSkipCutsceneEvent.AddDynamic(Cutscene_Widget, &UUW_Cutscene::SkipCutscene);
+
+	AMaster_Character* Character = Cast<AMaster_Character>(PlayerController->GetCharacter());
+	if (Character)
+	{
+
+		check(Character->DA_events && "UUralJam_GameInstance::StartPlay_NewLevel: AMaster_Character->DA_events - is NULL")
+		
+		TSubclassOf<UUW_Cutscene>ClassCutsceneWidget =Character->DA_events->ListCutscenes[ID];
 	
-	Cutscene_Widget->OnEndCutsceneEvent.AddDynamic(this, &UUralJam_GameInstance::EndLaunchCutscene);
+		check(ClassCutsceneWidget && "UUralJam_GameInstance::LaunchCutscene: ClassCutsceneWidget - is invalid");
+	
+		Cutscene_Widget = Cast<UUW_Cutscene>(CreateWidget(this, ClassCutsceneWidget));
+		Cutscene_Widget->OnEndCutsceneEvent.AddDynamic(this, &UUralJam_GameInstance::EndLaunchCutscene);
+
+		Cutscene_Widget->ID = ID;
+		Cutscene_Widget->AddToViewport();
+		PlayerController->OnSkipCutsceneEvent.AddDynamic(Cutscene_Widget, &UUW_Cutscene::SkipCutscene);
+	
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT(" UUralJam_GameInstance::StartPlay_NewLevel:  Cast<AMaster_Character>(PlayerController->GetCharacter()   -  FAIL"));
+	}
 }
 void  UUralJam_GameInstance::EndLaunchCutscene(UUW_Cutscene* CutscenePtr)
 {
 	PlayerController->OnSkipCutsceneEvent.RemoveDynamic(CutscenePtr, &UUW_Cutscene::SkipCutscene);
+	OnEndCutsceneEvent.Broadcast(CutscenePtr->ID);
 	CutscenePtr->RemoveFromParent();
 	SetGameState_state(EGameState::GS_Cutscene,false);
 	PlayerController->ActivationController();
@@ -433,13 +449,13 @@ float UUralJam_GameInstance::GetMasterVolume()const
 
 
 
-void UUralJam_GameInstance::CreateNewMission_Implementation(const FString& String)
+void UUralJam_GameInstance::CreateNewMission_Implementation(EMissionID ID)
 {
 
 	IManagment_Missions* Interface = Cast<IManagment_Missions>(PlayerController);
 	if (Interface)
 	{
-		Interface->Execute_CreateNewMission(PlayerController,String);
+		Interface->Execute_CreateNewMission(PlayerController, ID);
 		
 	}
 	else

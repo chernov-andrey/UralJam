@@ -33,7 +33,7 @@ void AMaster_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
-void AMaster_Character::CreateNewMission_Implementation(const FString& String)
+void AMaster_Character::CreateNewMission_Implementation(EMissionID ID)
 {
 	UE_LOG(LogTemp, Warning, TEXT(" AMaster_Character::CreateNewMission_Implementation: not override"));
 }
