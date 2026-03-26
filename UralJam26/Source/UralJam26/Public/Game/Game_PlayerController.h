@@ -87,9 +87,9 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UUralJam_GameInstance>	UralJam_GameInstance;
-
-	AMaster_Character* Character;
 public:
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<AMaster_Character> MCharacter;
 
 	UFUNCTION()
 	bool TeleportToTargetPoint(FName Tag_TargetPoint);
@@ -133,5 +133,5 @@ private:
 
 //--------------------------------------------- Management_Missions --------------------------------------
 	
-	virtual void CreateNewMission_Implementation(const FString& String) override;
+	virtual void CreateNewMission_Implementation(EMissionID ID) override;
 };

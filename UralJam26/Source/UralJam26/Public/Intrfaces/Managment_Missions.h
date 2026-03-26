@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Data/PDA_Character_Events.h"
 #include "Managment_Missions.generated.h"
 
 UINTERFACE(MinimalAPI)
@@ -19,8 +20,8 @@ class URALJAM26_API IManagment_Missions
 {
 	GENERATED_BODY()
 public:
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Managment missions" )
-	void CreateNewMission(const FString& Text) ;
+	void CreateNewMission(EMissionID ID) ;
 	
 };

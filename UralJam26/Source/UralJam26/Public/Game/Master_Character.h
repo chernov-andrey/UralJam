@@ -9,12 +9,18 @@
 #include "Data/PDA_Character_Events.h"
 #include "Master_Character.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCompleteQuest, EMissionID, ID);
+
 UCLASS(Abstract)
 class URALJAM26_API AMaster_Character : public ACharacter, public IManagment_Missions
 {
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(BlueprintAssignable,BlueprintCallable)
+	FCompleteQuest OnCompleteQuestEvent;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TObjectPtr<UPDA_Character_Events> DA_events;
 
@@ -59,6 +65,6 @@ public:
 //--------------------------------------------- Management_Missions --------------------------------------
 public:
 
-	virtual void CreateNewMission_Implementation(const FString& String) override;
+	virtual void CreateNewMission_Implementation(EMissionID ID) override;
 
 };

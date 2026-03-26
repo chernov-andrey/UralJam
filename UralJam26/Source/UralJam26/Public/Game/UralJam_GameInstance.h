@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Intrfaces/Managment_Missions.h"
+#include "Data/PDA_Character_Events.h"
 #include "UralJam_GameInstance.generated.h"
 
 class UUserWidget;
@@ -16,6 +17,7 @@ class UUW_SplashScreen;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FChanged_GS);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLoadedLevel, FName, LevelName);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveCutscene, ECutsceneID, ID);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnloadCurrentLevel);
 
 	UENUM(BlueprintType)
@@ -61,6 +63,9 @@ public:
 //============================================================================================================================================
 public:
 	UPROPERTY(BlueprintAssignable)
+	FRemoveCutscene OnEndCutsceneEvent;
+
+	UPROPERTY(BlueprintAssignable)
 	FChanged_GS OnChangedGameStateEvent;
 
 	UPROPERTY(BlueprintAssignable)
@@ -90,7 +95,7 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere)
-	ULevelStreaming* Current_UseStreamingLevel;
+	FName Current_UseStreamingLevel;
 	
 	UPROPERTY(VisibleAnywhere)
 	ULevelStreaming* Current_LoadedStreamingLevel;
@@ -238,7 +243,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)// Создаем виджет катсцены 
-	void LaunchCutscene(TSubclassOf<UUW_Cutscene> ClassCutsceneWidget);
+	void LaunchCutscene(ECutsceneID ID);
 	
 	UFUNCTION()
 	void EndLaunchCutscene(UUW_Cutscene* CutscenePtr);
@@ -246,9 +251,7 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<UUW_Cutscene> Cutscene_Widget;
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Widgets")
-	TArray<TSubclassOf<UUW_Cutscene>> WidgetTypes_Cutscenes;
+
 
 	//============================================================================================================================================
 	//                                              NAMES
@@ -258,10 +261,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Maps")
 	TArray<FName> Levels_is_Linkage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Maps")
-	FName Level_1_Name = TEXT("Level_1");
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Maps")
-	FName Level_2_Name = TEXT("Level_2");
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game |  Maps")
+	TArray<FName> TargetPoint_Tag;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Save/Load")
 	FString SaveSlotProgress = TEXT("Progress");
@@ -269,8 +271,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Save/Load")
 	FString SaveSlotSettings = TEXT("Settings");
 
-	UPROPERTY(EditAnywhere, Category = "Game |  Maps")
-	FName TargetPoint_Tag_1;
 
 
 
@@ -305,7 +305,7 @@ private:
 	//--------------------------------------------- Management_Missions --------------------------------------
 	
 public:
-virtual void CreateNewMission_Implementation(const FString& String) override;
+virtual void CreateNewMission_Implementation(EMissionID ID) override;
 
 
 
