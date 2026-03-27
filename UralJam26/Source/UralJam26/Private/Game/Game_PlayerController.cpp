@@ -35,8 +35,8 @@ void AGame_PlayerController::BeginPlay()
     {
         UE_LOG(LogTemp, Error, TEXT("AGame_PlayerController::BeginPlay: FAIL CAST GameInstance to UralJam_GameInstance!"));
     }
-    Character =Cast<AMaster_Character>( GetCharacter());
-    check(Character);
+    MCharacter =Cast<AMaster_Character>( GetCharacter());
+    check(MCharacter);
   
     Super::BeginPlay();
 }
@@ -142,30 +142,30 @@ void AGame_PlayerController::Move(const FInputActionValue& Value)
     FVector2D V2;
     V2.X = Value.Get<FVector2D>().X;
     V2.Y=  Value.Get<FVector2D>().Y;
-    Character->Move_Character(V2);
+    MCharacter->Move_Character(V2);
 }
 void AGame_PlayerController::Attacks(const FInputActionValue& Value)
 {
-   Character->Attack_Character(Value.Get<bool>());
+   MCharacter->Attack_Character(Value.Get<bool>());
 }
 void AGame_PlayerController::BlockAttack(const FInputActionValue& Value)
 {
-    Character->Block_Character(Value.Get<bool>());
+    MCharacter->Block_Character(Value.Get<bool>());
 }
 
 void AGame_PlayerController::AltAttack(const FInputActionValue& Value)
 {
-    Character->AltAttack_Character(Value.Get<bool>());
+    MCharacter->AltAttack_Character(Value.Get<bool>());
 }
 
 void AGame_PlayerController::Jump(const FInputActionValue& Value)
 {
-    Character->Jump_Character(Value.Get<bool>());
+    MCharacter->Jump_Character(Value.Get<bool>());
 }
 
 void AGame_PlayerController::AltJump(const FInputActionValue& Value)
 {
-    Character->AltJump_Character(Value.Get<bool>());
+    MCharacter->AltJump_Character(Value.Get<bool>());
 }
 
 
@@ -191,13 +191,13 @@ void AGame_PlayerController::OpenClosePauseMenu()
 //--------------------------------------------- Management_Missions --------------------------------------
 
 
-void AGame_PlayerController::CreateNewMission_Implementation(const FString& String)
+void AGame_PlayerController::CreateNewMission_Implementation(EMissionID ID)
 {
     
-    IManagment_Missions* Interface = Cast<IManagment_Missions>(Character);
+    IManagment_Missions* Interface = Cast<IManagment_Missions>(MCharacter);
     if (Interface)
     {
-        Interface->Execute_CreateNewMission(Character,String);
+        Interface->Execute_CreateNewMission(MCharacter, ID);
     }
     else
     {
@@ -205,3 +205,18 @@ void AGame_PlayerController::CreateNewMission_Implementation(const FString& Stri
     }
    
 }
+void AGame_PlayerController::CreateQuest_GoTo_Implementation(EMissionID ID, AEvent_Initiator_atMap* InitiatorActor)
+{
+
+    IManagment_Missions* Interface = Cast<IManagment_Missions>(MCharacter);
+    if (Interface)
+    {
+        Interface->Execute_CreateQuest_GoTo(MCharacter, ID, InitiatorActor);
+
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("AGame_PlayerController::CreateQuest_GoTo_Implementation: PlayerController hasnt interface  -IManagment_Missions "));
+    }
+}
+

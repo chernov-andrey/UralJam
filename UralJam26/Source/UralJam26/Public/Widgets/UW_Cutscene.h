@@ -13,6 +13,10 @@ class URALJAM26_API UUW_Cutscene : public UUserWidget
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY()
+	ECutsceneID ID;
+
+
 	UPROPERTY(BlueprintReadWrite,EditAnywhere)
 	bool bCanBeSkip=false;
 	
