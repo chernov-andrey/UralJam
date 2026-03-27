@@ -72,7 +72,7 @@ void  UUralJam_GameInstance::LoadedLevel(int32 Linkage)
 		UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::LoadedLevel: %s - is loaded"), *Levels_is_Linkage[0].ToString());
 		LevelS->SetShouldBeLoaded(true);
 		LevelS->SetShouldBeVisible(true);
-		
+	
 		OnLevelLoadedEvent.Broadcast(Levels_is_Linkage[Linkage]);
 	}
 	else
@@ -88,11 +88,12 @@ void  UUralJam_GameInstance::LoadedLevel(int32 Linkage)
 void  UUralJam_GameInstance::StartPlay_NewLevel(FName NewLevelName) // Начало новой игры
 {
 	OnLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::StartPlay_NewLevel);
-
-	if (!PlayerController->TeleportToTargetPoint(TargetPoint_Tag[Levels_is_Linkage.Find(NewLevelName)]))
+	
+	/*if (!PlayerController->TeleportToTargetPoint(TargetPoint_Tag[Levels_is_Linkage.Find(NewLevelName)]))
 	{
 		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::StartNewSession  -> PlayerController->TeleportToTargetPoint(TargetPoint_Tag[Levels_is_Linkage.Find(NewLevelName)])   -  FAIL"));
-	}
+	}*/
+
 	RemoveLoadingScreen_Widget();
 
 	SetGameState_state(EGameState::GS_LoadingLevel, false);
@@ -338,7 +339,7 @@ void UUralJam_GameInstance::RemoveLoadingScreen_Widget()
 void  UUralJam_GameInstance::LaunchCutscene(ECutsceneID ID)
 {
 	SetGameState_state(EGameState::GS_Cutscene,true);
-	PlayerController->DeactivationController();
+	
 
 	AMaster_Character* Character = Cast<AMaster_Character>(PlayerController->GetCharacter());
 	if (Character)
@@ -352,7 +353,7 @@ void  UUralJam_GameInstance::LaunchCutscene(ECutsceneID ID)
 	
 		Cutscene_Widget = Cast<UUW_Cutscene>(CreateWidget(this, ClassCutsceneWidget));
 		Cutscene_Widget->OnEndCutsceneEvent.AddDynamic(this, &UUralJam_GameInstance::EndLaunchCutscene);
-
+		Cutscene_Widget->OnShownOpeningEvent.AddDynamic(PlayerController,&AGame_PlayerController::DeactivationController);
 		Cutscene_Widget->ID = ID;
 		Cutscene_Widget->AddToViewport();
 		PlayerController->OnSkipCutsceneEvent.AddDynamic(Cutscene_Widget, &UUW_Cutscene::SkipCutscene);

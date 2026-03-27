@@ -91,14 +91,14 @@ private:
 public:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AMaster_Character> MCharacter;
-
-	UFUNCTION()
-	bool TeleportToTargetPoint(FName Tag_TargetPoint);
+/*
+	UFUNCTION(BlueprintCallable)
+	bool TeleportToTargetPoint(FName Tag_TargetPoint);*/
 
 	// Management game mod ------------------------------------------------------------------------------------
 
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ActivationController();
 	UFUNCTION()
 	void DeactivationController();

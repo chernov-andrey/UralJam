@@ -38,6 +38,9 @@ void AGame_PlayerController::BeginPlay()
     MCharacter =Cast<AMaster_Character>( GetCharacter());
     check(MCharacter);
   
+    SetControlRotation(Rotator);
+    GetPawn()->SetActorRotation(Rotator);
+
     Super::BeginPlay();
 }
 
@@ -45,7 +48,7 @@ void AGame_PlayerController::BeginPlay()
 // Management game mod  ------------------------------------------------------------------------------------------
 
 
-
+/*
 
 bool AGame_PlayerController::TeleportToTargetPoint(FName Tag_TargetPoint)
 {
@@ -61,14 +64,17 @@ bool AGame_PlayerController::TeleportToTargetPoint(FName Tag_TargetPoint)
         return false;
     }
     SetControlRotation(Rotator );
-    GetPawn()->SetActorLocation(allActors[0]->GetActorLocation());
-    GetPawn()->SetActorRotation(Rotator);
+    GetCharacter()->tele
+   GetCharacter()->TeleportTo(allActors[0]->GetActorLocation(), Rotator,false,false );
+   /* GetPawn()->SetActorLocation(allActors[0]->GetActorLocation());
+   GetPawn()->SetActorRotation(Rotator);
 
     return true;
 }
-
+*/
 void AGame_PlayerController::ActivationController()
 {
+    SetPause(false);
     SubsystemInput->AddMappingContext(MappingContext_Char_Hero_2, 3);
     SubsystemInput->AddMappingContext(MappingContext_Char_Hero_1, 3);
     SubsystemInput->AddMappingContext(MappingContext_Char, 3);
@@ -76,6 +82,7 @@ void AGame_PlayerController::ActivationController()
 
 void AGame_PlayerController::DeactivationController()
 {
+    SetPause(true);
     SubsystemInput->RemoveMappingContext(MappingContext_Char);
     SubsystemInput->RemoveMappingContext(MappingContext_Char_Hero_1);
     SubsystemInput->RemoveMappingContext(MappingContext_Char_Hero_2);

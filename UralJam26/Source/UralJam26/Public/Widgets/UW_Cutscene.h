@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "UW_Cutscene.generated.h"
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShownOpening);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEndCutscene, UUW_Cutscene*,CutscenePtr);
 
 UCLASS(Abstract)
@@ -31,4 +31,6 @@ public:
 	
 	 UPROPERTY(BlueprintAssignable)
 	FEndCutscene OnEndCutsceneEvent;
+	UPROPERTY(BlueprintCallable)
+	FShownOpening OnShownOpeningEvent;
 };
