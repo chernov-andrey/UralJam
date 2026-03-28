@@ -17,6 +17,7 @@
 
 void UUralJam_GameInstance::Init()
 {
+	//UGameplayStatics::OpenLevel(GetWorld(),"Main_Level");
 	InitMapState();
 	Super::Init();
 	SetGameState_state(EGameState::GS_Starting,true);
@@ -89,13 +90,8 @@ void  UUralJam_GameInstance::StartPlay_NewLevel(FName NewLevelName) // Начало но
 {
 	OnLevelLoadedEvent.RemoveDynamic(this, &UUralJam_GameInstance::StartPlay_NewLevel);
 	
-	/*if (!PlayerController->TeleportToTargetPoint(TargetPoint_Tag[Levels_is_Linkage.Find(NewLevelName)]))
-	{
-		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::StartNewSession  -> PlayerController->TeleportToTargetPoint(TargetPoint_Tag[Levels_is_Linkage.Find(NewLevelName)])   -  FAIL"));
-	}*/
-
 	RemoveLoadingScreen_Widget();
-
+	PlayerController->ActivationController();
 	SetGameState_state(EGameState::GS_LoadingLevel, false);
 }
 
@@ -121,9 +117,12 @@ void UUralJam_GameInstance::OnUnloadLevel(int32 Linkage)
 }
 
 
-void  UUralJam_GameInstance::Launch_NewLevel(FName NewLevelName) // start transition level
+void  UUralJam_GameInstance::Launch_NewLevel(FName NewLevelName, int Index_Hero) // start transition level
 {
 	SetGameState_state(EGameState::GS_LoadingLevel, true);
+
+	CurrentClassHero = Index_Hero;
+	PlayerController->ReplaceCharacter();
 
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::PlayNewlevel"));
 	CreateLoadingScreen_Widget();
@@ -167,7 +166,7 @@ void  UUralJam_GameInstance::Launch_NewLevel(FName NewLevelName) // start transi
 
 void UUralJam_GameInstance::StartNewSession()
 {
- 	Launch_NewLevel(Levels_is_Linkage[0]);
+ 	Launch_NewLevel(Levels_is_Linkage[0],0);
 }
 
 // Game STATE -------------------------------------------------------------------------------------------
@@ -340,7 +339,7 @@ void  UUralJam_GameInstance::LaunchCutscene(ECutsceneID ID)
 {
 	SetGameState_state(EGameState::GS_Cutscene,true);
 	
-
+	
 	AMaster_Character* Character = Cast<AMaster_Character>(PlayerController->GetCharacter());
 	if (Character)
 	{

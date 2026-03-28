@@ -91,9 +91,9 @@ private:
 public:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AMaster_Character> MCharacter;
-/*
-	UFUNCTION(BlueprintCallable)
-	bool TeleportToTargetPoint(FName Tag_TargetPoint);*/
+
+	UFUNCTION()
+	void ReplaceCharacter(); // index from ListClassHero in gameInstance
 
 	// Management game mod ------------------------------------------------------------------------------------
 
@@ -102,6 +102,8 @@ public:
 	void ActivationController();
 	UFUNCTION()
 	void DeactivationController();
+
+
 private:
 	void OpenClosePauseMenu();
 

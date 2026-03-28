@@ -29,7 +29,6 @@ void AGame_PlayerController::BeginPlay()
          
             bShowMouseCursor = true;    
         }
-
     }
     else
     {
@@ -41,6 +40,7 @@ void AGame_PlayerController::BeginPlay()
     SetControlRotation(Rotator);
     GetPawn()->SetActorRotation(Rotator);
 
+
     Super::BeginPlay();
 }
 
@@ -48,30 +48,24 @@ void AGame_PlayerController::BeginPlay()
 // Management game mod  ------------------------------------------------------------------------------------------
 
 
-/*
-
-bool AGame_PlayerController::TeleportToTargetPoint(FName Tag_TargetPoint)
+void AGame_PlayerController::ReplaceCharacter()
 {
-    if (!Tag_TargetPoint.IsValid()) 
+    int index = UralJam_GameInstance->CurrentClassHero;
+    check(UralJam_GameInstance && "AGame_PlayerController::ReplaceCharacter: UralJam_GameInstance - invalid");
+    check(UralJam_GameInstance->ListClassHero.IsValidIndex(index)&& "AGame_PlayerController::ReplaceCharacter: index - invalid");
+    TSubclassOf<AMaster_Character> NewClass = UralJam_GameInstance->ListClassHero[index];
+    if (MCharacter->IsA(NewClass))
     {
-        return false;
+        return;
     }
-    TArray<AActor*,FDefaultAllocator> allActors;
- 
-    UGameplayStatics::GetAllActorsOfClassWithTag(this, ATargetPoint::StaticClass(), Tag_TargetPoint, allActors);
-    if (allActors.IsEmpty())
-    {
-        return false;
-    }
-    SetControlRotation(Rotator );
-    GetCharacter()->tele
-   GetCharacter()->TeleportTo(allActors[0]->GetActorLocation(), Rotator,false,false );
-   /* GetPawn()->SetActorLocation(allActors[0]->GetActorLocation());
-   GetPawn()->SetActorRotation(Rotator);
-
-    return true;
+    UnPossess();
+    MCharacter = Cast<AMaster_Character>(GetWorld()->SpawnActor<ACharacter>(NewClass));
+    check(MCharacter);
+    MCharacter->SetActorRotation(Rotator);
+    Possess(MCharacter);
 }
-*/
+
+
 void AGame_PlayerController::ActivationController()
 {
     SetPause(false);

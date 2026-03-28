@@ -116,7 +116,7 @@ private:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void Launch_NewLevel(FName NewLevelName);
+	void Launch_NewLevel(FName NewLevelName, int Index_Hero);
 private:
 	UFUNCTION()
 	void LoadedLevel(int32 Linkage);
@@ -295,7 +295,16 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Game | Settings")
 	TObjectPtr<UProgress_SaveGame> Progress;
 
-	//--------------------------------------------------- Load level --------------------------------------
+
+	//--------------------------------------------------- Select Hero --------------------------------------
+
+public:
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Game | Characters")
+	TArray<TSubclassOf<AMaster_Character>> ListClassHero;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int CurrentClassHero;
 
 
 
