@@ -58,8 +58,10 @@ void AGame_PlayerController::ReplaceCharacter()
     {
         return;
     }
+    FVector Loc = MCharacter->GetActorLocation();
+
     UnPossess();
-    MCharacter = Cast<AMaster_Character>(GetWorld()->SpawnActor<ACharacter>(NewClass));
+    MCharacter = Cast<AMaster_Character>(GetWorld()->SpawnActor<ACharacter>(NewClass, Loc,Rotator));
     check(MCharacter);
     MCharacter->SetActorRotation(Rotator);
     Possess(MCharacter);
