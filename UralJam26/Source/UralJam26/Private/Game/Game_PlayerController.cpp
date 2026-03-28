@@ -58,7 +58,7 @@ void AGame_PlayerController::ReplaceCharacter()
     {
         return;
     }*/
-    FVector Loc = MCharacter->GetActorLocation()+FVector(0,0,300);
+    FVector Loc = MCharacter->GetActorLocation()+FVector(0,0,2000);
 
     UnPossess();
     MCharacter->Destroy();
