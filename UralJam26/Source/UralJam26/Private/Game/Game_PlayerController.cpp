@@ -54,13 +54,14 @@ void AGame_PlayerController::ReplaceCharacter()
     check(UralJam_GameInstance && "AGame_PlayerController::ReplaceCharacter: UralJam_GameInstance - invalid");
     check(UralJam_GameInstance->ListClassHero.IsValidIndex(index)&& "AGame_PlayerController::ReplaceCharacter: index - invalid");
     TSubclassOf<AMaster_Character> NewClass = UralJam_GameInstance->ListClassHero[index];
-    if (MCharacter->IsA(NewClass))
+  /*  if (MCharacter->IsA(NewClass))
     {
         return;
-    }
+    }*/
     FVector Loc = MCharacter->GetActorLocation()+FVector(0,0,300);
 
     UnPossess();
+    MCharacter->Destroy();
     MCharacter = Cast<AMaster_Character>(GetWorld()->SpawnActor<ACharacter>(NewClass, Loc,Rotator));
     check(MCharacter);
     MCharacter->SetActorRotation(Rotator);
