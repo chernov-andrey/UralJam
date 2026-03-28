@@ -28,4 +28,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Managment missions")
 	void CreateQuest_GoTo(EMissionID ID, AEvent_Initiator_atMap* InitiatorActor);
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Managment missions")
+	void CreateQuest_KillAll(EMissionID ID, int CountLiveEnemy);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Managment missions")
+	void UpdateQuest_KillAll(EMissionID ID, int CountLiveEnemy);
 };

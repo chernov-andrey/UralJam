@@ -44,3 +44,13 @@ void AMaster_Character::CreateQuest_GoTo_Implementation(EMissionID ID, AEvent_In
 	UE_LOG(LogTemp, Warning, TEXT(" AMaster_Character::CreateQuest_GoTo_Implementation: not override"));
 }
 
+void AMaster_Character::CreateQuest_KillAll_Implementation(EMissionID ID, int CountLiveEnemy)
+{
+	UE_LOG(LogTemp, Warning, TEXT(" AMaster_Character::CreateQuest_KillAll_Implementation: not override"));
+}
+
+void AMaster_Character::UpdateQuest_KillAll_Implementation(EMissionID ID, int CountLiveEnemy)
+{
+	UE_LOG(LogTemp, Warning, TEXT(" AMaster_Character::CreateQuest_KillAll_Implementation: not override"));
+}
+

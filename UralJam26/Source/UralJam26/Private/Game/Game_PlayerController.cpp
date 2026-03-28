@@ -58,7 +58,7 @@ void AGame_PlayerController::ReplaceCharacter()
     {
         return;
     }
-    FVector Loc = MCharacter->GetActorLocation();
+    FVector Loc = MCharacter->GetActorLocation()+FVector(0,0,300);
 
     UnPossess();
     MCharacter = Cast<AMaster_Character>(GetWorld()->SpawnActor<ACharacter>(NewClass, Loc,Rotator));
@@ -223,3 +223,30 @@ void AGame_PlayerController::CreateQuest_GoTo_Implementation(EMissionID ID, AEve
     }
 }
 
+void AGame_PlayerController::CreateQuest_KillAll_Implementation(EMissionID ID, int CountLiveEnemy)
+{
+    IManagment_Missions* Interface = Cast<IManagment_Missions>(MCharacter);
+    if (Interface)
+    {
+        Interface->Execute_CreateQuest_KillAll(MCharacter, ID, CountLiveEnemy);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("AGame_PlayerController::CreateQuest_GoTo_Implementation: PlayerController hasnt interface  -IManagment_Missions "));
+    }
+
+}
+
+void AGame_PlayerController::UpdateQuest_KillAll_Implementation(EMissionID ID, int CountLiveEnemy)
+{
+    IManagment_Missions* Interface = Cast<IManagment_Missions>(MCharacter);
+    if (Interface)
+    {
+        Interface->Execute_UpdateQuest_KillAll(MCharacter, ID, CountLiveEnemy);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("AGame_PlayerController::UpdateQuest_KillAll_Implementation: PlayerController hasnt interface  -IManagment_Missions "));
+    }
+
+}

@@ -479,3 +479,29 @@ void UUralJam_GameInstance::CreateQuest_GoTo_Implementation(EMissionID ID, AEven
 	}
 
 }
+
+void UUralJam_GameInstance::CreateQuest_KillAll_Implementation(EMissionID ID, int CountLiveEnemy)
+{
+	IManagment_Missions* Interface = Cast<IManagment_Missions>(PlayerController);
+	if (Interface)
+	{
+		Interface->Execute_CreateQuest_KillAll(PlayerController, ID, CountLiveEnemy);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::CreateQuest_GoTo_Implementation: PlayerController hasnt interface  -IManagment_Missions "));
+	}
+}
+
+void UUralJam_GameInstance::UpdateQuest_KillAll_Implementation(EMissionID ID, int CountLiveEnemy)
+{
+	IManagment_Missions* Interface = Cast<IManagment_Missions>(PlayerController);
+	if (Interface)
+	{
+		Interface->Execute_UpdateQuest_KillAll(PlayerController, ID, CountLiveEnemy);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::UpdateQuest_KillAll_Implementation: PlayerController hasnt interface  -IManagment_Missions "));
+	}
+}

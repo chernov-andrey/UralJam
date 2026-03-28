@@ -33,6 +33,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnloadCurrentLevel);
 		GS_LoadingLevel
 	};
 
+	UENUM(BlueprintType)
+		enum class EInheritance : uint8
+	{
+		Death,
+		Left,
+		Win
+	};
 
 UCLASS()
 class URALJAM26_API UUralJam_GameInstance : public UGameInstance, public IManagment_Missions
@@ -317,7 +324,21 @@ public:
 public:
 virtual void CreateNewMission_Implementation(EMissionID ID) override;
 virtual void CreateQuest_GoTo_Implementation(EMissionID ID, AEvent_Initiator_atMap* InitiatorActor) override;
+virtual void CreateQuest_KillAll_Implementation(EMissionID ID, int CountLiveEnemy) override;
+virtual void UpdateQuest_KillAll_Implementation(EMissionID ID, int CountLiveEnemy) override;
 
+
+
+
+
+//============================================================================================================================================
+//                                             INTERFACES
+//============================================================================================================================================
+
+
+
+UPROPERTY( BlueprintReadWrite)
+ EInheritance InheritanceFather;
 
 
 };

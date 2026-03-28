@@ -68,5 +68,6 @@ public:
 public:
 	virtual void CreateNewMission_Implementation(EMissionID ID) override;
 	virtual void CreateQuest_GoTo_Implementation(EMissionID ID, AEvent_Initiator_atMap* InitiatorActor) override;
-
+	virtual void CreateQuest_KillAll_Implementation(EMissionID ID,int CountLiveEnemy) override;
+	virtual void UpdateQuest_KillAll_Implementation(EMissionID ID, int CountLiveEnemy) override;
 };
