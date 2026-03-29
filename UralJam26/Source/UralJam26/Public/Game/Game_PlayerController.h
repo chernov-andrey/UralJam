@@ -100,7 +100,7 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	void ActivationController();
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void DeactivationController();
 
 
