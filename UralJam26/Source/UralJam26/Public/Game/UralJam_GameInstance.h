@@ -16,6 +16,7 @@ class UUW_Cutscene;
 class UUW_SplashScreen;
 class AEvent_Initiator_atMap;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeSettingsSound, float, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FChanged_GS);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLoadedLevel, FName, LevelName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemoveCutscene, ECutsceneID, ID);
@@ -163,8 +164,9 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Settings")
 	TObjectPtr<USoundClass> MasterSoundClass;
-
-
+	
+	UPROPERTY(BlueprintAssignable)
+	FChangeSettingsSound OnChangesSettingSoundEvent;
 	//============================================================================================================================================
 	//                                              Media management
 	//============================================================================================================================================

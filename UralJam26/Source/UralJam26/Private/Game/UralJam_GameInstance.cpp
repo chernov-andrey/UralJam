@@ -390,7 +390,7 @@ void UUralJam_GameInstance::LoadSettings()
 	else
 	{
 		Settings = Cast< USettings_SaveGame>(UGameplayStatics::CreateSaveGameObject(USettings_SaveGame::StaticClass()));
-		Settings->MasterVolume = 0.5f;
+		Settings->MasterVolume = 0.25f;
 		UE_LOG(LogTemp, Warning, TEXT("UUralJam_GameInstance::LoadSettings  is fails!"));
 	}
 	ApplySettings();
@@ -424,6 +424,7 @@ void UUralJam_GameInstance::ApplySettings()
 		MasterSoundClass->Properties.Volume = Settings->MasterVolume;				
 	}
 	SaveSettings();
+	OnChangesSettingSoundEvent.Broadcast(Settings->MasterVolume);
 }
 
 // Audio volume  -------------------------------------------------------------------------------------------
@@ -431,13 +432,13 @@ void UUralJam_GameInstance::ApplySettings()
 void UUralJam_GameInstance::SetMasterVolume(float newVolume)
 {
 	check(Settings&&"UUralJam_GameInstance::SetMasterVolume FALE!")
-		Settings->MasterVolume = FMath::Clamp(newVolume, 0.001f, 1.0f);
-		ApplySettings();
+		Settings->MasterVolume = FMath::Clamp(newVolume, 0.001f, 1.0f)/2.5f;
+		ApplySettings();	
 }
 float UUralJam_GameInstance::GetMasterVolume()const
 {
 	check(Settings && "UUralJam_GameInstance::GetMasterVolume FALE!")
-		return Settings->MasterVolume;
+		return Settings->MasterVolume*2.5f;
 
 }
 
