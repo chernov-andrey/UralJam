@@ -210,7 +210,7 @@ protected:
 	//----------------------------------------------- Main Menu ------------------------------------------
 
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void CreateMainMenu_Widget();
 	UFUNCTION()
 	void RemoveMainMenu_Widget();
