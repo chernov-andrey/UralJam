@@ -6,12 +6,14 @@
 #include "Widgets/UW_Cutscene.h"
 #include "Widgets/UW_SplashScreen.h"
 #include "Widgets/UW_LoadingScreen.h"
+#include "Widgets\UW_PauseMenu.h"
 #include "Game\Game_PlayerController.h"
 #include "SavesObjects\Progress_SaveGame.h"
 #include "SavesObjects\Settings_SaveGame.h"
 #include "Engine/LevelStreaming.h"
 #include "Blueprint/UserWidget.h"
 #include "Game\Master_Character.h"
+#include "AudioDevice.h"
 #include "Sound/SoundClass.h"
 
 
@@ -26,6 +28,16 @@ void UUralJam_GameInstance::Init()
 void UUralJam_GameInstance::SetPlayerController(TObjectPtr<AGame_PlayerController> lPlayerController)
 {
 	PlayerController = lPlayerController;
+	
+	if (MasterSoundMix)
+	{
+		check(GetWorld());
+		UGameplayStatics::SetBaseSoundMix(this, MasterSoundMix);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UUralJam_GameInstance::SetPlayerController: MasterSoundMix.IsNull - true"));
+	}
 }
 
 
@@ -244,6 +256,10 @@ void UUralJam_GameInstance::OpenClosePauseMenu()
 		
 		PlayerController->SetPause(false);
 		
+		
+
+		OnHiddenPauseMenuEvent.Broadcast();
+
 		HiddenPauseMenu();	
 	}
 	else 
@@ -252,7 +268,7 @@ void UUralJam_GameInstance::OpenClosePauseMenu()
 		UE_LOG(LogTemp, Display, TEXT(" AGame_PlayerController::PauseFlipFlop : New game state - GS_Paused"));
 		
 		PlayerController->SetPause(true);
-		
+		OnShowPauseMenuEvent.Broadcast();
 		ShowPauseMenu();
 	}
 }
@@ -260,7 +276,8 @@ void UUralJam_GameInstance::HiddenPauseMenu()
 {
 	if (PauseMenu)
 	{
-		PauseMenu->RemoveFromParent();
+		Cast<UUW_PauseMenu>(PauseMenu)->Pre_ClosePauseMenu();
+		//PauseMenu->RemoveFromParent();
 		PauseMenu = nullptr;
 	}
 	else
@@ -419,10 +436,24 @@ void UUralJam_GameInstance::SaveSettings()
 }
 void UUralJam_GameInstance::ApplySettings()
 {
-	if (MasterSoundClass&&Settings)
-	{		
-		MasterSoundClass->Properties.Volume = Settings->MasterVolume;				
+	if (MasterSoundMix)
+	{
+		check(GetWorld());
+		UGameplayStatics::SetSoundMixClassOverride(GetWorld(),
+			MasterSoundMix,
+			Master_SoundClass,
+			Settings->MasterVolume,
+			1,
+			0
+		);
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UGameInstance_WM::OpenMainMenu: MasterSoundMix.IsNull - true"));
+	}
+
+
+	
 	SaveSettings();
 	OnChangesSettingSoundEvent.Broadcast(Settings->MasterVolume);
 }
@@ -432,13 +463,13 @@ void UUralJam_GameInstance::ApplySettings()
 void UUralJam_GameInstance::SetMasterVolume(float newVolume)
 {
 	check(Settings&&"UUralJam_GameInstance::SetMasterVolume FALE!")
-		Settings->MasterVolume = FMath::Clamp(newVolume, 0.001f, 1.0f)/2.5f;
+		Settings->MasterVolume = FMath::Clamp(newVolume, 0.001f, 1.0f);
 		ApplySettings();	
 }
 float UUralJam_GameInstance::GetMasterVolume()const
 {
 	check(Settings && "UUralJam_GameInstance::GetMasterVolume FALE!")
-		return Settings->MasterVolume*2.5f;
+		return Settings->MasterVolume;
 
 }
 

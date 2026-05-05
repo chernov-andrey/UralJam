@@ -1,4 +1,4 @@
-/ Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -15,6 +15,7 @@ class AGame_PlayerController;
 class UUW_Cutscene;
 class UUW_SplashScreen;
 class AEvent_Initiator_atMap;
+class USoundMix;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FChangeSettingsSound, float, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FChanged_GS);
@@ -82,6 +83,14 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FUnloadCurrentLevel OnUnloadCCurrentLevelEvent;
+
+	UPROPERTY(BlueprintAssignable)
+	FUnloadCurrentLevel OnShowPauseMenuEvent;
+
+	UPROPERTY(BlueprintAssignable)
+	FUnloadCurrentLevel  OnHiddenPauseMenuEvent;
+
+
 //============================================================================================================================================
 //                                             Control --
 //============================================================================================================================================
@@ -162,9 +171,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Game | Settings")
 	float GetMasterVolume()const;
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Settings")
-	TObjectPtr<USoundClass> MasterSoundClass;
+
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Settings")
+	TObjectPtr<USoundMix> MasterSoundMix;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Settings")
+	USoundClass* Master_SoundClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Settings")
+	USoundClass* UI_Effects_SoundClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Settings")
+	USoundClass* Music_SoundClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Game | Settings")
+	USoundClass* Game_Effects_SoundClass;
+
 	UPROPERTY(BlueprintAssignable)
 	FChangeSettingsSound OnChangesSettingSoundEvent;
 	//============================================================================================================================================

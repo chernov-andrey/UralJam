@@ -42,7 +42,7 @@ void UUW_PauseMenu::Pre_ClosePauseMenu_Implementation()
 
 void UUW_PauseMenu::ClosePauseMenu()
 {
-	UralJam_GameInstance->OpenClosePauseMenu();
+	RemoveFromParent();
 }
 
 void UUW_PauseMenu::ReceivedAnswer_NewGame(bool Answer)

@@ -16,13 +16,14 @@ class AEvent_Initiator_atMap;
 class UEnhancedInputLocalPlayerSubsystem;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSkipCutscene, bool, skipAll);
+
+
 UCLASS()
 class URALJAM26_API AGame_PlayerController : public APlayerController,public  IManagment_Missions
 {
 	GENERATED_BODY()
 public:
 	FOnSkipCutscene OnSkipCutsceneEvent;
-
 
 
 	UFUNCTION(BlueprintCallable)
