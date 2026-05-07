@@ -104,6 +104,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DeactivationController();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ChangeLevel();
 
 private:
 	void OpenClosePauseMenu();
