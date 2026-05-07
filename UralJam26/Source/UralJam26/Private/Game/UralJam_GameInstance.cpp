@@ -135,6 +135,8 @@ void  UUralJam_GameInstance::Launch_NewLevel(FName NewLevelName, int Index_Hero)
 
 	CurrentClassHero = Index_Hero;
 	PlayerController->ReplaceCharacter();
+	PlayerController->ChangeLevel();
+
 
 	UE_LOG(LogTemp, Display, TEXT("UUralJam_GameInstance::PlayNewlevel"));
 	CreateLoadingScreen_Widget();
