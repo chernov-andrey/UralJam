@@ -215,7 +215,7 @@ protected:
 
 
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OpenClosePauseMenu();
 
 private:
